@@ -1,0 +1,5 @@
+/config/application.yml
+/config/database.yml
+/config/newrelic.yml
+/config/puma.rb
+/log/*
