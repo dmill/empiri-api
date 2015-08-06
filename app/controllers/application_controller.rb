@@ -24,4 +24,10 @@ class ApplicationController < ActionController::Metal
   include ActionController::ParamsWrapper
 
   ActiveSupport.run_load_hooks(:action_controller, self)
+
+  protected
+
+  def render_not_found
+    render json: { errors: "Not Found" }, status: :not_found
+  end
 end
