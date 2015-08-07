@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   match "/500" => "default_errors#exception", via: [:get, :post, :put, :delete, :patch]
 
   resources :experiments, only: [ :show ]
+  resources :threads, only: [ :index, :show ]
 end

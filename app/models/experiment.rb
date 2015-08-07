@@ -4,4 +4,5 @@ class Experiment < ActiveRecord::Base
 
 
   validates :title, presence: true
+  validates :publication, presence: true
 end
