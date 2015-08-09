@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe ThreadsController do
   let(:response_body) { JSON.parse(subject.body) }
-  let(:thread) { create(:publication) }
+  let(:thread) { create(:publication, closed: true, closed_at: Time.now - 5.days) }
 
   shared_examples "a threads controller GET action" do |id = nil|
     it "has a json content type" do
@@ -39,6 +39,8 @@ describe ThreadsController do
       it { expect(subject.response_code).to eq(200) }
       it { expect(response_body["id"]).to eq(thread.id) }
       it { expect(response_body["title"]).to eq(thread.title) }
+      it { expect(response_body["closed"]).to eq(thread.closed) }
+      it { expect(response_body["closed_at"]).to eq(thread.closed_at.to_s) }
     end
   end
 end
