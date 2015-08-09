@@ -9,6 +9,6 @@ Dependencies
 
 Setup
 ------------
-  bundle install
-  bundle exec rake db:setup
-  bundle exec puma
+    bundle install
+    bundle exec rake db:setup
+    bundle exec puma
