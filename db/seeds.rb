@@ -5,3 +5,9 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+if Rails.env == "development"
+  require "./lib/utilities/seed_generators.rb"
+  include SeedGenerators
+
+  seed
+end
