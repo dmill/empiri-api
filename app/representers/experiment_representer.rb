@@ -12,4 +12,6 @@ class ExperimentRepresenter < Roar::Decorator
   property :results, getter: ->(_) { errors.empty? ? {results: "this is a placeholder for now"} : nil }
   property :discussion, getter: ->(_) { errors.empty? ? "this is a placeholder for now" : nil }
   property :errors, getter: ->(_) { errors.empty? ? nil : errors }
+
+  collection :reviews, embedded: true, extend: ReviewRepresenter, getter: ->(_) { errors.empty? ? reviews : nil }
 end

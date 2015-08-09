@@ -1,7 +1,7 @@
 require 'roar/decorator'
 require 'roar/json/hal'
 
-class ThreadRepresenter < Roar::Decorator
+class TruncatedThreadRepresenter < Roar::Decorator
   include Roar::JSON::HAL
 
   property :id, getter: ->(_) { errors.empty? ? id : nil }
@@ -11,5 +11,4 @@ class ThreadRepresenter < Roar::Decorator
   property :closed_at, getter: ->(_) { errors.empty? && closed ? closed_at.to_s : nil }
 
   collection :authors, embedded: true, extend: TruncatedUserRepresenter, getter: ->(_) { errors.empty? ? users : nil }
-  collection :reviews, embedded: true, extend: ReviewRepresenter, getter: ->(_) { errors.empty? ? reviews : nil }
 end

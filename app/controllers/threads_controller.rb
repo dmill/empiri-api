@@ -1,6 +1,8 @@
 class ThreadsController < ApplicationController
 
   def index
+    @threads = Publication.limit(5)
+    render_threads
   end
 
   def show
@@ -9,6 +11,10 @@ class ThreadsController < ApplicationController
   end
 
   private
+
+  def render_threads
+    render json: ThreadsRepresenter.new(@threads), status: :ok
+  end
 
   def render_thread
     render json: ThreadRepresenter.new(@thread), status: :ok

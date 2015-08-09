@@ -19,6 +19,26 @@ describe ThreadsController do
     end
   end
 
+  describe "GET index" do
+    subject { :index }
+    before(:each) do
+      6.times{ create(:publication) }
+    end
+
+    it_should_behave_like "a threads controller GET action"
+
+    context "successful request" do
+      subject { get :index }
+
+      it { expect(subject.response_code).to eq(200) }
+      it { expect(response_body["threads"].count).to eq(5) }
+      it { expect(response_body["threads"].first.keys).to include("id") }
+      it { expect(response_body["threads"].first.keys).to include("title") }
+      it { expect(response_body["threads"].first.keys).to include("closed") }
+      it { expect(response_body["threads"].first["_embedded"]["authors"].class).to eq(Array) }
+    end
+  end
+
   describe "GET show" do
     subject { :show }
 
@@ -41,6 +61,8 @@ describe ThreadsController do
       it { expect(response_body["title"]).to eq(thread.title) }
       it { expect(response_body["closed"]).to eq(thread.closed) }
       it { expect(response_body["closed_at"]).to eq(thread.closed_at.to_s) }
+      it { expect(response_body["_embedded"]["authors"].class).to eq(Array) }
+      it { expect(response_body["_embedded"]["reviews"].class).to eq(Array) }
     end
   end
 end
