@@ -5,10 +5,14 @@ Dependencies
 ------------
 - Ruby 2.2.2
 - Bundler
-- MySQL
+- PostgreSQL
 
 Setup
 ------------
+Create a database.yml with the necessary information and credentials to connect to your postgres database. Then run:
     bundle install
     bundle exec rake db:setup
-    bundle exec puma
+
+Running The App
+---------------
+   bundle exec puma
