@@ -63,6 +63,7 @@ describe ThreadsController do
       it { expect(response_body["closed_at"]).to eq(thread.closed_at.to_s) }
       it { expect(response_body["_embedded"]["authors"].class).to eq(Array) }
       it { expect(response_body["_embedded"]["reviews"].class).to eq(Array) }
+      it { expect(response_body["_embedded"]["experiments"].class).to eq(Array) }
     end
   end
 end

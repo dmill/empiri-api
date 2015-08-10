@@ -11,5 +11,6 @@ class ThreadRepresenter < Roar::Decorator
   property :closed_at, getter: ->(_) { errors.empty? && closed ? closed_at.to_s : nil }
 
   collection :authors, embedded: true, extend: TruncatedUserRepresenter, getter: ->(_) { errors.empty? ? users : nil }
+  collection :experiments, embedded: true, extend: TruncatedExperimentRepresenter,  getter: ->(_) { errors.empty? ? experiments : nil }
   collection :reviews, embedded: true, extend: ReviewRepresenter, getter: ->(_) { errors.empty? ? reviews : nil }
 end
