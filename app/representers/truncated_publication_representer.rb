@@ -1,7 +1,7 @@
 require 'roar/decorator'
 require 'roar/json/hal'
 
-class TruncatedThreadRepresenter < Roar::Decorator
+class TruncatedPublicationRepresenter < Roar::Decorator
   include Roar::JSON::HAL
 
   property :id, getter: ->(_) { errors.empty? ? id : nil }

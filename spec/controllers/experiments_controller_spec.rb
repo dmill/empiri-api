@@ -38,7 +38,7 @@ describe ExperimentsController do
 
       it { expect(subject.response_code).to eq(200) }
       it { expect(response_body["title"]).to eq(experiment.title) }
-      it { expect(response_body["thread_id"]).to eq(experiment.publication_id) }
+      it { expect(response_body["publication_id"]).to eq(experiment.publication_id) }
       it { expect(response_body["submitted_at"]).to eq(experiment.submitted_at.to_s) }
       it { expect(response_body["submitted"]).to eq(experiment.submitted) }
       it { expect(response_body["_embedded"]["reviews"].class).to eq(Array)}
