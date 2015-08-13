@@ -74,6 +74,7 @@ GEM
     pg (0.18.2)
     puma (2.12.2)
     rack (1.6.4)
+    rack-cors (0.4.0)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.3)
@@ -149,8 +150,12 @@ DEPENDENCIES
   figaro (~> 1.1.0)
   pg (~> 0.18.2)
   puma (~> 2.12.2)
+  rack-cors
   rails (~> 4.2.3)
   roar (~> 1.0.1)
   rspec-rails
   shoulda-matchers (~> 2.8.0)
   spring
+
+BUNDLED WITH
+   1.10.6

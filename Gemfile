@@ -23,6 +23,8 @@ group :development, :test do
   gem 'spring'
   #Fake seed data
   gem 'faker', git: 'git@github.com:stympy/faker.git'
+  #allow CORS
+  gem 'rack-cors', :require => 'rack/cors'
 end
 
 group :test do
