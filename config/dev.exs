@@ -35,8 +35,8 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :empiri_api, EmpiriApi.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "empiri_api_dev",
+  username: "empiri",
+  password: "",
+  database: "empiri_dev",
   hostname: "localhost",
   pool_size: 10

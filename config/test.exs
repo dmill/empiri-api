@@ -12,8 +12,8 @@ config :logger, level: :warn
 # Configure your database
 config :empiri_api, EmpiriApi.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "empiri_api_test",
+  username: "empiri",
+  password: "",
+  database: "empiri_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
