@@ -34,6 +34,7 @@ defmodule EmpiriApi.Web do
       import Ecto.Query, only: [from: 1, from: 2]
 
       import EmpiriApi.Router.Helpers
+      require Logger
     end
   end
 

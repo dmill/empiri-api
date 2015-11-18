@@ -7,7 +7,7 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
 config :empiri_api, EmpiriApi.Endpoint,
-  http: [port: 4000],
+  http: [port: {:system, "PORT"}],
   debug_errors: true,
   code_reloader: true,
   cache_static_lookup: false,
@@ -40,3 +40,8 @@ config :empiri_api, EmpiriApi.Repo,
   database: "empiri_dev",
   hostname: "localhost",
   pool_size: 10
+
+#Auth0 configuration
+config :empiri_api, Auth0,
+  client_id: "32BARvuzoMtbvsTUYcgwwqwKX0EZZgc8",
+  client_secret: "LvYFdcSmTYcd05NuHCf-zTLRqt--ygcqtCn6-WOSVPAqJarW1LFeFkZUfFa3eJQa"

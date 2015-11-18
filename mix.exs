@@ -18,8 +18,8 @@ defmodule EmpiriApi.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {EmpiriApi, []},
-     applications: [:phoenix, :phoenix_html, :cowboy, :logger,
-                    :phoenix_ecto, :postgrex]]
+     applications: [:phoenix, :phoenix_html, :cowboy,
+                    :logger, :phoenix_ecto, :postgrex]]
   end
 
   # Specifies which paths to compile per environment.
@@ -35,7 +35,8 @@ defmodule EmpiriApi.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:phoenix_html, "~> 2.1"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:joken, "~> 0.16"}]
   end
 
   # Aliases are shortcut or tasks specific to the current project.

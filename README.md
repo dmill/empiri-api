@@ -24,13 +24,17 @@ Create and migrate the test database:
     $ env MIX_ENV=test mix ecto.create
     $ env MIX_ENV=test mix ecto.migrate
 
+Install mix dependencies:
+
+    $ mix deps.get
+
 Run the application:
 
-    $ mix phoenix.server
+    $ PORT=4000 mix phoenix.server
 
 Run an interactive console:
 
-    $ iex -S mix phoenix.server
+    $ PORT=4001 iex -S mix phoenix.server
 
 Run the tests:
 
