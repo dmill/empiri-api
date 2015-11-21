@@ -9,10 +9,15 @@ Development Setup
   - elixir
   - phoenix
 
-Set up database permissions. From psql:
+Install mix dependencies:
 
-    # CREATE user empiri;
-    # ALTER USER empiri CREATEDB;
+    $ mix deps.get
+
+Set up database config files:
+
+    # dev.exs
+    # test.exs
+    # prod.exs
 
 Create and migrate the database:
 
@@ -23,10 +28,6 @@ Create and migrate the test database:
 
     $ env MIX_ENV=test mix ecto.create
     $ env MIX_ENV=test mix ecto.migrate
-
-Install mix dependencies:
-
-    $ mix deps.get
 
 Run the application:
 
@@ -39,7 +40,3 @@ Run an interactive console:
 Run the tests:
 
     $ mix test
-
-
-
-
