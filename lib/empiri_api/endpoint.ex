@@ -36,6 +36,6 @@ defmodule EmpiriApi.Endpoint do
     signing_salt: "9o3pCEP9"
 
   plug Corsica, origins: Application.get_env(:empiri_api, Frontend)[:origin],
-                allow_headers: ["accept", "authorization"]
+                allow_headers: ["accept", "authorization", "content-type"]
   plug EmpiriApi.Router
 end
