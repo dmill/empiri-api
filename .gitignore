@@ -22,3 +22,8 @@ erl_crash.dump
 # secrets file as long as you replace its contents by environment
 # variables.
 /config/prod.secret.exs
+
+# Configuration Files
+/config/dev.exs
+/config/test.exs
+/config/prod.exs
