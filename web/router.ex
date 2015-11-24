@@ -19,7 +19,7 @@ defmodule EmpiriApi.Router do
     pipe_through :api
 
     get "/", StatusController, :index
-    resources "/users", UserController
+    resources "/users", UserController, only: [:show, :update]
   end
 
   def validate_auth_token() do
