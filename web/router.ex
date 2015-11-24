@@ -12,7 +12,8 @@ defmodule EmpiriApi.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug Joken.Plug, on_verifying: &EmpiriApi.Router.validate_auth_token/0
+    plug Joken.Plug, on_verifying: &EmpiriApi.Router.validate_auth_token/0,
+                     on_error: &EmpiriApi.Router.unauthorized/2
   end
 
   scope "/", EmpiriApi do
@@ -30,5 +31,9 @@ defmodule EmpiriApi.Router do
     |> Joken.with_json_module(Poison)
     |> Joken.with_signer(Joken.hs256(secret))
     |> Joken.with_validation("aud", &(&1 == client_id))
+  end
+
+  def unauthorized(conn, _) do
+    {conn, %{error: "unauthorized"}}
   end
 end
