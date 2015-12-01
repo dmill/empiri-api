@@ -37,7 +37,8 @@ defmodule EmpiriApi.Mixfile do
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:cowboy, "~> 1.0"},
      {:joken, "~> 0.16"},
-     {:corsica, "~> 0.4"}]
+     {:corsica, "~> 0.4"},
+     {:faker, "~> 0.6"}]
   end
 
   # Aliases are shortcut or tasks specific to the current project.

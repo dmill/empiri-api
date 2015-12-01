@@ -7,12 +7,14 @@ defmodule EmpiriApi.User do
     field :title, :string
     field :email, :string
     field :organization, :string
+    field :auth_id, :string
+    field :photo_url, :string
 
     timestamps
   end
 
-  @required_fields ~w(first_name last_name title email organization)
-  @optional_fields ~w()
+  @required_fields ~w(first_name last_name email auth_id)
+  @optional_fields ~w(title organization photo_url)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -23,5 +25,6 @@ defmodule EmpiriApi.User do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> validate_format(:email, ~r/@/)
   end
 end
