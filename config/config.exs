@@ -10,7 +10,7 @@ config :empiri_api, EmpiriApi.Endpoint,
   url: [host: "localhost"],
   root: Path.dirname(__DIR__),
   secret_key_base: "A+2wW4hbnigxSNPBSF570LpwNFnW3LbijkqvBe/XGtE+vjZhLTLVMDpjnuAmFljO",
-  render_errors: [accepts: ~w(html json)],
+  render_errors: [accepts: "json"],
   pubsub: [name: EmpiriApi.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
