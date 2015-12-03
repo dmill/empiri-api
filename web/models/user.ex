@@ -8,12 +8,13 @@ defmodule EmpiriApi.User do
     field :email, :string
     field :organization, :string
     field :auth_id, :string
+    field :auth_provider, :string
     field :photo_url, :string
 
     timestamps
   end
 
-  @required_fields ~w(first_name last_name email auth_id)
+  @required_fields ~w(first_name last_name email auth_id auth_provider)
   @optional_fields ~w(title organization photo_url)
 
   @doc """

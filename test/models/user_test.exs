@@ -4,8 +4,9 @@ defmodule EmpiriApi.UserTest do
   alias EmpiriApi.User
 
   @valid_attrs   %{email: "pug@relaxation.com", first_name: "Pug",
-                   last_name: "Jeremy", auth_id: "something|longnumber",
-                   organization: "AKC", title: "Overlord"}
+                   last_name: "Jeremy", auth_id: "12345",
+                   organization: "AKC", title: "Overlord",
+                   auth_provider: "petco"}
   @empty_attrs   %{}
 
   test "changeset with valid attributes" do

@@ -2,7 +2,9 @@ defmodule EmpiriApi.UserControllerTest do
   use EmpiriApi.ConnCase
 
   alias EmpiriApi.User
-  @valid_attrs %{email: "some content", first_name: "some content", last_name: "some content", organization: "some content", title: "some content"}
+  @valid_attrs %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                 organization: "Harvard", title: "President",
+                 auth_id: "12345", auth_provider: "petco"}
   @invalid_attrs %{}
 
   setup do
