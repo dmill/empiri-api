@@ -1,11 +1,6 @@
 defmodule EmpiriApi.StatusControllerTest do
   use EmpiriApi.ConnCase
 
-  setup do
-    conn = conn() |> put_req_header("accept", "application/json")
-    {:ok, conn: conn}
-  end
-
   test "without an Authorization header" do
     conn = get conn, status_path(conn, :index)
     assert json_response(conn, 401)["error"] == "unauthorized"

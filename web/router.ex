@@ -12,7 +12,10 @@ defmodule EmpiriApi.Router do
     pipe_through :api
 
     get "/", StatusController, :index
-    resources "/users", UserController, only: [:show, :update]
+
+    #user resources use the auth token and therefore are not canonically RESTful
+    get "/users", UserController, :show
+    post "/users", UserController, :update
   end
 
   def validate_auth_token() do

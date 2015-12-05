@@ -26,18 +26,10 @@ defmodule EmpiriApi.ConnCase do
       import Ecto.Query, only: [from: 2]
 
       import EmpiriApi.Router.Helpers
+      import EmpiriApi.ControllerTestHelpers
 
       # The default endpoint for testing
       @endpoint EmpiriApi.Endpoint
-
-      def generate_auth_token() do
-        {:ok, secret} = Base.url_decode64(Application.get_env(:empiri_api, Auth0)[:client_secret])
-        %{client_id: Application.get_env(:empiri_api, Auth0)[:client_id]}
-          |> Joken.token
-          |> Joken.with_signer(Joken.hs256(secret))
-          |> Joken.sign
-          |> Joken.get_compact
-      end
     end
   end
 
