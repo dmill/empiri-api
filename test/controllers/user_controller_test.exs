@@ -59,7 +59,7 @@ defmodule EmpiriApi.UserControllerTest do
       assert count_fun.() == user_count
     end
 
-    test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:invalid]}, does not insert into db" do
+    test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:invalid]}, does not insert into db", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@invalid_params)}")
       count_fun = fn() -> Repo.all(from u in User, select: count(u.id)) |> List.first end
       user_count = count_fun.()
@@ -68,13 +68,13 @@ defmodule EmpiriApi.UserControllerTest do
       assert count_fun.() == user_count
     end
 
-    test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:invalid]}, returns an error" do
+    test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:invalid]}, returns an error", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@invalid_params)}")
       conn = get conn, user_path(conn, :show)
       assert json_response(conn, 422)["errors"] != nil
     end
 
-    test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:valid]}, inserts into db" do
+    test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:valid]}, inserts into db", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
       count_fun = fn() -> Repo.all(from u in User, select: count(u.id)) |> List.first end
       user_count = count_fun.()
@@ -83,7 +83,7 @@ defmodule EmpiriApi.UserControllerTest do
       assert count_fun.() == user_count + 1
     end
 
-    test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:valid]}, returns user data" do
+    test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:valid]}, returns user data", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
       conn = get conn, user_path(conn, :show)
       assert json_response(conn, 200)["data"]["first_name"] == @valid_params[:given_name]
@@ -91,16 +91,37 @@ defmodule EmpiriApi.UserControllerTest do
     end
   end
 
-  # test "updates and renders chosen resource when data is valid", %{conn: conn} do
-    # user = Repo.insert! %User{}
-    # conn = put conn, user_path(conn, :update, user), user: @valid_attrs
-    # assert json_response(conn, 200)["data"]["id"]
-    # assert Repo.get_by(User, @valid_attrs)
-  # end
+  defmodule UpdateContext do
+    use SharedContext
 
-  # test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    # user = Repo.insert! %User{}
-    # conn = put conn, user_path(conn, :update, user), user: @invalid_attrs
-    # assert json_response(conn, 422)["errors"] != %{}
-  # end
+    @action "UPDATE"
+
+    setup do
+      conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
+      valid_attrs = Map.drop(@valid_attrs, [:auth_provider, :auth_id])
+      {:ok, conn: conn, valid_attrs: valid_attrs}
+    end
+
+    test "#{@action}: resource not found", %{conn: conn, valid_attrs: valid_attrs} do
+      conn = put conn, user_path(conn, :update, 77), user: valid_attrs
+      assert json_response(conn, 404)["error"] == "Not Found"
+    end
+
+    test "#{@action}: resource found, data invalid", %{conn: conn, valid_attrs: valid_attrs} do
+      user  = Repo.insert! Map.merge(%User{}, @valid_attrs)
+      conn = put conn, user_path(conn, :update, user.id), user: %{email: "invalid-email-string"}
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "#{@action}: resource found, data is valid", %{conn: conn, valid_attrs: valid_attrs} do
+      user  = Repo.insert! Map.merge(%User{}, @valid_attrs)
+      conn = put conn, user_path(conn, :update, user.id), user: %{email: "valid@example.com"}
+      assert json_response(conn, 200)["data"] == %{"id" => user.id,
+        "first_name" => user.first_name,
+        "last_name" => user.last_name,
+        "title" => user.title,
+        "email" => "valid@example.com",
+        "organization" => user.organization}
+    end
+  end
 end
