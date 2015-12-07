@@ -23,4 +23,18 @@ defmodule EmpiriApi.UserTest do
     changeset = User.changeset(%User{}, Map.drop(@valid_attrs, [:email]))
     refute changeset.valid?
   end
+
+  test "changeset with a non-unique auth_id, but different auth_provider" do
+    User.changeset(%User{}, @valid_attrs) |> Repo.insert
+    {result, _} = User.changeset(%User{}, %{@valid_attrs | auth_provider: "else"}) |> Repo.insert
+
+    assert result == :ok
+  end
+
+  test "changeset with a non-unique auth_id and the same auth_provider" do
+    User.changeset(%User{}, @valid_attrs) |> Repo.insert
+    {result, errors} = User.changeset(%User{}, @valid_attrs) |> Repo.insert
+
+    assert result == :error
+  end
 end
