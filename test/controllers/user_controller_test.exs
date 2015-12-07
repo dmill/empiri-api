@@ -16,12 +16,16 @@ defmodule EmpiriApi.UserControllerTest do
         @valid_attrs %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
                        organization: "Harvard", title: "President",
                        auth_id: "12345", auth_provider: "petco"}
-        @invalid_attrs %{}
+
+        @valid_params %{email: @valid_attrs[:email], given_name: @valid_attrs[:first_name],
+                        family_name: @valid_attrs[:last_name], auth_id: @valid_attrs[:auth_id],
+                        auth_provider: @valid_attrs[:auth_provider]}
+
+        @invalid_params %{auth_id: "12345"}
 
         setup do
           conn = conn()
             |> put_req_header("accept", "application/json")
-            |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_attrs)}")
           {:ok, conn: conn}
         end
       end
@@ -34,6 +38,7 @@ defmodule EmpiriApi.UserControllerTest do
     @action "SHOW"
 
     test "#{@action}: #{@context_desc[:existing_record]}, shows resource from db", %{conn: conn} do
+      conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
       user = Repo.insert! Map.merge(%User{},@valid_attrs)
       conn = get conn, user_path(conn, :show)
       assert json_response(conn, 200)["data"] == %{"id" => user.id,
@@ -44,16 +49,45 @@ defmodule EmpiriApi.UserControllerTest do
         "organization" => user.organization}
     end
 
+    test "#{@action}: #{@context_desc[:existing_record]}, does not insert into db", %{conn: conn} do
+      conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
+      user = Repo.insert! Map.merge(%User{},@valid_attrs)
+      count_fun = fn() -> Repo.all(from u in User, select: count(u.id)) |> List.first end
+      user_count = count_fun.()
+      get conn, user_path(conn, :show)
+
+      assert count_fun.() == user_count
+    end
+
     test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:invalid]}, does not insert into db" do
+      conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@invalid_params)}")
+      count_fun = fn() -> Repo.all(from u in User, select: count(u.id)) |> List.first end
+      user_count = count_fun.()
+      get conn, user_path(conn, :show)
+
+      assert count_fun.() == user_count
     end
 
     test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:invalid]}, returns an error" do
+      conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@invalid_params)}")
+      conn = get conn, user_path(conn, :show)
+      assert json_response(conn, 422)["errors"] != nil
     end
 
     test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:valid]}, inserts into db" do
+      conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
+      count_fun = fn() -> Repo.all(from u in User, select: count(u.id)) |> List.first end
+      user_count = count_fun.()
+      get conn, user_path(conn, :show)
+
+      assert count_fun.() == user_count + 1
     end
 
     test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:valid]}, returns user data" do
+      conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
+      conn = get conn, user_path(conn, :show)
+      assert json_response(conn, 200)["data"]["first_name"] == @valid_params[:given_name]
+
     end
   end
 

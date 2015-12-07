@@ -7,8 +7,16 @@ defmodule EmpiriApi.UserController do
   plug :translate_token_claims
 
   def show(conn, _) do
-    user = Repo.get_by!(User, auth_id: conn.user[:auth_id], auth_provider: conn.user[:auth_provider])
-    render(conn, "show.json", user: user)
+    user = RepoExtensions.get_or_insert_by(User, %{auth_id: conn.user[:auth_id], auth_provider: conn.user[:auth_provider]}, conn.user)
+
+    case user do
+      {:ok, valid_user} ->
+        render(conn, "show.json", user: valid_user)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(EmpiriApi.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
@@ -26,7 +34,10 @@ defmodule EmpiriApi.UserController do
   end
 
   defp translate_token_claims(conn, _) do
-    [auth_provider, auth_id] = String.split(conn.assigns[:joken_claims]["sub"], "|")
-    Map.merge(conn, %{user: %{auth_provider: auth_provider, auth_id: auth_id}})
+    joken_attrs = conn.assigns[:joken_claims]
+    [auth_provider, auth_id] = String.split(joken_attrs["sub"], "|")
+    Map.merge(conn, %{user: %{auth_provider: auth_provider, auth_id: auth_id,
+                              email: joken_attrs["email"], first_name: joken_attrs["given_name"],
+                              last_name: joken_attrs["family_name"], photo_url: joken_attrs["picture"]}})
   end
 end

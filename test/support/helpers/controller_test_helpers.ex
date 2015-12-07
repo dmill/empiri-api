@@ -5,8 +5,8 @@ defmodule EmpiriApi.ControllerTestHelpers do
     %{aud: Application.get_env(:empiri_api, Auth0)[:client_id],
       sub: "#{claims[:auth_provider]}|#{claims[:auth_id]}",
       email: claims[:email],
-      first_name: claims[:first_name],
-      last_name: claims[:last_name]}
+      given_name: claims[:given_name],
+      family_name: claims[:family_name]}
       |> Joken.token
       |> Joken.with_signer(Joken.hs256(secret))
       |> Joken.sign
