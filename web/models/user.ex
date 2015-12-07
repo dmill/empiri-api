@@ -27,5 +27,10 @@ defmodule EmpiriApi.User do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:email, ~r/@/)
+    |> update_change(:email, &String.downcase/1)
+    |> update_change(:first_name, &String.capitalize/1)
+    |> update_change(:last_name, &String.capitalize/1)
+    |> update_change(:title, &String.capitalize/1)
+    |> unique_constraint(:auth_id, name: :users_auth_id_auth_provider_index)
   end
 end
