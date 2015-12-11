@@ -22,15 +22,15 @@ defmodule EmpiriApi.UserController do
 
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Repo.get(User, id)
-    if user, do: update_and_render(conn, user, user_params), else: render_not_found(conn)
+    if user, do: authorize_and_update(conn, user, user_params), else: render_not_found(conn)
   end
 
-  defp translate_token_claims(conn, _) do
-    joken_attrs = conn.assigns[:joken_claims]
-    [auth_provider, auth_id] = String.split(joken_attrs["sub"], "|")
-    Map.merge(conn, %{user: %{auth_provider: auth_provider, auth_id: auth_id,
-                              email: joken_attrs["email"], first_name: joken_attrs["given_name"],
-                              last_name: joken_attrs["family_name"], photo_url: joken_attrs["picture"]}})
+  defp authorize_and_update(conn, user, user_params) do
+    if user.auth_provider == conn.user[:auth_provider] && user.auth_id == conn.user[:auth_id] do
+      update_and_render(conn, user, user_params)
+    else
+      render_unauthorized(conn)
+    end
   end
 
   defp update_and_render(conn, user, user_params) do
@@ -44,9 +44,5 @@ defmodule EmpiriApi.UserController do
         |> put_status(:unprocessable_entity)
         |> render(EmpiriApi.ChangesetView, "error.json", changeset: changeset)
     end
-  end
-
-  defp render_not_found(conn) do
-    conn |> put_status(:not_found) |> render(EmpiriApi.ErrorView, "404.json")
   end
 end

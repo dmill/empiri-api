@@ -31,6 +31,7 @@ defmodule EmpiriApi.Web do
 
       alias EmpiriApi.Repo
       alias EmpiriApi.Plugs.AuthPlug
+      import EmpiriApi.Extensions.ControllerExtensions
       import Ecto.Model
       import Ecto.Query, only: [from: 1, from: 2]
 

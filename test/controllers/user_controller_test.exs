@@ -107,8 +107,18 @@ defmodule EmpiriApi.UserControllerTest do
       assert json_response(conn, 404)["error"] == "Not Found"
     end
 
+    test "#{@action}: resource found, user is unauthorized", %{conn: conn, valid_attrs: valid_attrs} do
+      second_user_attrs = %{email: "guy@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                            organization: "Harvard", title: "President",
+                            auth_id: "1234567", auth_provider: "petco"}
+      user1 = Repo.insert! Map.merge(%User{}, @valid_attrs)
+      user2 = Repo.insert! Map.merge(%User{}, second_user_attrs)
+      conn = put conn, user_path(conn, :update, user2.id), user: %{email: "valid@example.com"}
+      assert json_response(conn, 401)["error"] == "Unauthorized"
+    end
+
     test "#{@action}: resource found, data invalid", %{conn: conn, valid_attrs: valid_attrs} do
-      user  = Repo.insert! Map.merge(%User{}, @valid_attrs)
+      user = Repo.insert! Map.merge(%User{}, @valid_attrs)
       conn = put conn, user_path(conn, :update, user.id), user: %{email: "invalid-email-string"}
       assert json_response(conn, 422)["errors"] != %{}
     end
