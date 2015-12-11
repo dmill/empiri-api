@@ -4,10 +4,11 @@ defmodule EmpiriApi.UserController do
   alias EmpiriApi.User
 
   plug :scrub_params, "user" when action in [:create, :update]
+  plug AuthPlug
   plug :translate_token_claims
 
   def show(conn, _) do
-    user = RepoExtensions.get_or_insert_by(User, %{auth_id: conn.user[:auth_id], auth_provider: conn.user[:auth_provider]}, conn.user)
+    user = Repo.get_or_insert_by(User, %{auth_id: conn.user[:auth_id], auth_provider: conn.user[:auth_provider]}, conn.user)
 
     case user do
       {:ok, valid_user} ->
