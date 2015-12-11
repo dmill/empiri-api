@@ -16,6 +16,7 @@ defmodule EmpiriApi.Router do
     #user show uses the auth token and therefore is not canonically RESTful
     get "/users", UserController, :show
     resources "/users", UserController, only: [:update]
+    resources "/hypotheses", HypothesisController, except: [:edit, :new]
   end
 
   def validate_auth_token() do
