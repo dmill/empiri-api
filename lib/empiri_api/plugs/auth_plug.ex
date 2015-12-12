@@ -8,7 +8,7 @@ defmodule EmpiriApi.Plugs.AuthPlug do
     Joken.Plug.call(conn, { &validate_auth_token/0, &unauthorized/2 })
   end
 
-  defp validate_auth_token() do
+  def validate_auth_token() do
     [client_id: client_id, client_secret: client_secret] = Application.get_env(:empiri_api, Auth0)
     {:ok, secret} = Base.url_decode64(client_secret)
 
