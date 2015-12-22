@@ -14,8 +14,8 @@ defmodule EmpiriApi.User do
     timestamps
   end
 
-  @required_fields ~w(first_name last_name email auth_id auth_provider)
-  @optional_fields ~w(title organization photo_url)
+  @required_fields ~w(email auth_id auth_provider)
+  @optional_fields ~w(first_name last_name title organization photo_url)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
