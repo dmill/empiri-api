@@ -4,6 +4,7 @@ defmodule EmpiriApi.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug ContentTypePlug, multipart_regex: ~r/photos/
   end
 
   scope "/", EmpiriApi do

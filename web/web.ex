@@ -54,6 +54,7 @@ defmodule EmpiriApi.Web do
   def router do
     quote do
       use Phoenix.Router
+      alias EmpiriApi.Plugs.ContentTypePlug
     end
   end
 

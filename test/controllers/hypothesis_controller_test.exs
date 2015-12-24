@@ -6,7 +6,9 @@ defmodule EmpiriApi.HypothesisControllerTest do
   @invalid_attrs %{}
 
   setup do
-    conn = conn() |> put_req_header("accept", "application/json")
+    conn = conn()
+            |> put_req_header("accept", "application/json")
+            |> put_req_header("content-type", "application/json")
     {:ok, conn: conn}
   end
 
@@ -30,26 +32,26 @@ defmodule EmpiriApi.HypothesisControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
-    conn = post conn, hypothesis_path(conn, :create), hypothesis: @valid_attrs
+    conn = post conn, hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @valid_attrs})
     assert json_response(conn, 201)["data"]["id"]
     assert Repo.get_by(Hypothesis, @valid_attrs)
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, hypothesis_path(conn, :create), hypothesis: @invalid_attrs
+    conn = post conn, hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @invalid_attrs})
     assert json_response(conn, 422)["errors"] != %{}
   end
 
   test "updates and renders chosen resource when data is valid", %{conn: conn} do
     hypothesis = Repo.insert! %Hypothesis{}
-    conn = put conn, hypothesis_path(conn, :update, hypothesis), hypothesis: @valid_attrs
+    conn = put conn, hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @valid_attrs})
     assert json_response(conn, 200)["data"]["id"]
     assert Repo.get_by(Hypothesis, @valid_attrs)
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
     hypothesis = Repo.insert! %Hypothesis{}
-    conn = put conn, hypothesis_path(conn, :update, hypothesis), hypothesis: @invalid_attrs
+    conn = put conn, hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @invalid_attrs})
     assert json_response(conn, 422)["errors"] != %{}
   end
 

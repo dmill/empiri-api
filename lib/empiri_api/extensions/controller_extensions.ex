@@ -10,6 +10,10 @@ defmodule EmpiriApi.Extensions.ControllerExtensions do
     conn |> put_status(:unauthorized) |> render(EmpiriApi.ErrorView, "401.json")
   end
 
+  def render_unsupported_media_type(conn) do
+    conn |> put_status(:unsupported_media_type) |> render(EmpiriApi.ErrorView, "415.json")
+  end
+
   def translate_token_claims(conn, _) do
     joken_attrs = conn.assigns[:joken_claims]
     [auth_provider, auth_id] = String.split(joken_attrs["sub"], "|")
