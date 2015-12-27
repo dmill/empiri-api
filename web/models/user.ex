@@ -1,5 +1,6 @@
 defmodule EmpiriApi.User do
   use EmpiriApi.Web, :model
+  use Arc.Ecto.Model
 
   schema "users" do
     field :first_name, :string
@@ -9,13 +10,16 @@ defmodule EmpiriApi.User do
     field :organization, :string
     field :auth_id, :string
     field :auth_provider, :string
-    field :photo_url, :string
+    field :photo_url, EmpiriApi.Photo.Type
 
     timestamps
   end
 
   @required_fields ~w(email auth_id auth_provider)
-  @optional_fields ~w(first_name last_name title organization photo_url)
+  @optional_fields ~w(first_name last_name title organization)
+
+  @required_file_fields ~w()
+  @optional_file_fields ~w(photo_url)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -26,6 +30,7 @@ defmodule EmpiriApi.User do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> cast_attachments(params, @required_file_fields, @optional_file_fields)
     |> validate_format(:email, ~r/@/)
     |> update_change(:email, &String.downcase/1)
     |> update_change(:first_name, &String.capitalize/1)

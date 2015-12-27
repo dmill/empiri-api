@@ -19,7 +19,8 @@ defmodule EmpiriApi.Mixfile do
   def application do
     [mod: {EmpiriApi, []},
      applications: [:phoenix, :phoenix_html, :cowboy,
-                    :logger, :phoenix_ecto, :postgrex]]
+                    :logger, :phoenix_ecto, :postgrex,
+                    :ex_aws, :httpoison]]
   end
 
   # Specifies which paths to compile per environment.
@@ -38,7 +39,11 @@ defmodule EmpiriApi.Mixfile do
      {:cowboy, "~> 1.0"},
      {:joken, "~> 0.16"},
      {:corsica, "~> 0.4"},
-     {:faker, "~> 0.6"}]
+     {:faker, "~> 0.6"},
+     {:httpoison, "~> 0.7"},
+     {:ex_aws, "~> 0.4.10"},
+     {:arc, "~> 0.2.2"},
+     {:arc_ecto, "~> 0.3.1"}]
   end
 
   # Aliases are shortcut or tasks specific to the current project.
