@@ -10,7 +10,7 @@ defmodule EmpiriApi.User do
     field :organization, :string
     field :auth_id, :string
     field :auth_provider, :string
-    field :photo_url, EmpiriApi.Photo.Type
+    field :profile_photo, EmpiriApi.Photo.Type
 
     timestamps
   end
@@ -19,7 +19,7 @@ defmodule EmpiriApi.User do
   @optional_fields ~w(first_name last_name title organization)
 
   @required_file_fields ~w()
-  @optional_file_fields ~w(photo_url)
+  @optional_file_fields ~w(profile_photo)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
