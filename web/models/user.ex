@@ -10,13 +10,14 @@ defmodule EmpiriApi.User do
     field :organization, :string
     field :auth_id, :string
     field :auth_provider, :string
+    field :external_photo_url, :string
     field :profile_photo, EmpiriApi.Photo.Type
 
     timestamps
   end
 
   @required_fields ~w(email auth_id auth_provider)
-  @optional_fields ~w(first_name last_name title organization)
+  @optional_fields ~w(first_name last_name title organization external_photo_url)
 
   @required_file_fields ~w()
   @optional_file_fields ~w(profile_photo)

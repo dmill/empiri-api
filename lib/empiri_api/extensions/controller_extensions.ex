@@ -19,6 +19,6 @@ defmodule EmpiriApi.Extensions.ControllerExtensions do
     [auth_provider, auth_id] = String.split(joken_attrs["sub"], "|")
     Map.merge(conn, %{user: %{auth_provider: auth_provider, auth_id: auth_id,
                               email: joken_attrs["email"], first_name: joken_attrs["given_name"],
-                              last_name: joken_attrs["family_name"], photo_url: joken_attrs["picture"]}})
+                              last_name: joken_attrs["family_name"], external_photo_url: joken_attrs["picture"]}})
   end
 end
