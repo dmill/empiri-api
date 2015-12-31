@@ -42,7 +42,7 @@ defmodule EmpiriApi.Mixfile do
      {:faker, "~> 0.6"},
      {:httpoison, "~> 0.7"},
      {:ex_aws, "~> 0.4.10"},
-     {:arc, "~> 0.2.2"},
+     {:arc, "~> 0.2.2", git: "git@github.com:dmill/arc.git"},
      {:arc_ecto, "~> 0.3.1"}]
   end
 
