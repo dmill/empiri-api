@@ -25,8 +25,8 @@ defmodule EmpiriApi.Plugs.ContentTypePlug do
 
   defp ensure_json_content(:error, conn), do: render_unsupported_media_type(conn) |> halt
 
-  defp ensure_multipart_content({:ok, type, subtype, _}, conn) do
-    if type == "multipart" && subtype == "form-data", do: conn, else: render_unsupported_media_type(conn) |> halt
+  defp ensure_multipart_content({:ok, type, _subtype, _}, conn) do
+    if type == "multipart", do: conn, else: render_unsupported_media_type(conn) |> halt
   end
 
   defp ensure_multipart_content(:error, conn), do: render_unsupported_media_type(conn) |> halt

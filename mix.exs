@@ -43,7 +43,8 @@ defmodule EmpiriApi.Mixfile do
      {:httpoison, "~> 0.7"},
      {:ex_aws, "~> 0.4.10"},
      {:arc, "~> 0.2.0", git: "git@github.com:dmill/arc.git", override: true},
-     {:arc_ecto, "~> 0.3.1"}]
+     {:arc_ecto, "~> 0.3.1"},
+     {:mock, "~> 0.1.1", only: :test}]
   end
 
   # Aliases are shortcut or tasks specific to the current project.
