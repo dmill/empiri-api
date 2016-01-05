@@ -18,8 +18,9 @@ defmodule EmpiriApi.Web do
 
   def model do
     quote do
-      use Ecto.Model
+      use Ecto.Schema
 
+      import Ecto
       import Ecto.Changeset
       import Ecto.Query, only: [from: 1, from: 2]
     end
@@ -32,7 +33,7 @@ defmodule EmpiriApi.Web do
       alias EmpiriApi.Repo
       alias EmpiriApi.Plugs.AuthPlug
       import EmpiriApi.Extensions.ControllerExtensions
-      import Ecto.Model
+      import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
 
       import EmpiriApi.Router.Helpers
@@ -63,7 +64,7 @@ defmodule EmpiriApi.Web do
       use Phoenix.Channel
 
       alias EmpiriApi.Repo
-      import Ecto.Model
+      import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
     end
   end
