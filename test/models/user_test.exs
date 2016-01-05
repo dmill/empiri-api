@@ -37,4 +37,9 @@ defmodule EmpiriApi.UserTest do
 
     assert result == :error
   end
+
+  test "changeset with an invalid profile_photo" do
+    changeset = User.changeset(%User{}, Map.merge(@valid_attrs, %{profile_photo: "string"}))
+    refute changeset.valid?
+  end
 end
