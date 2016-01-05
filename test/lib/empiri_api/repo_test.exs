@@ -34,7 +34,7 @@ defmodule EmpiriApi.RepoExtensionsTest do
     end
 
     test "#{@function_name}: record does not exist based on clause, attrs are invalid, returns error" do
-      {result, value} = Repo.get_or_insert_by(User, %{email: "somethingelse@gmail.com", last_name: @user.last_name})
+      {result, _} = Repo.get_or_insert_by(User, %{email: "somethingelse@gmail.com", last_name: @user.last_name})
       assert result == :error
     end
 

@@ -33,7 +33,7 @@ defmodule EmpiriApi.UserTest do
 
   test "changeset with a non-unique auth_id and the same auth_provider" do
     User.changeset(%User{}, @valid_attrs) |> Repo.insert
-    {result, errors} = User.changeset(%User{}, @valid_attrs) |> Repo.insert
+    {result, _} = User.changeset(%User{}, @valid_attrs) |> Repo.insert
 
     assert result == :error
   end

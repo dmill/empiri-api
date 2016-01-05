@@ -50,7 +50,7 @@ defmodule EmpiriApi.UserControllerTest do
 
     test "#{@action}: #{@context_desc[:existing_record]}, does not insert into db", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
-      user = Repo.insert! Map.merge(%User{},@valid_attrs)
+      Repo.insert! Map.merge(%User{},@valid_attrs)
       count_fun = fn() -> Repo.all(from u in User, select: count(u.id)) |> List.first end
       user_count = count_fun.()
       get conn, user_path(conn, :show)
@@ -112,7 +112,7 @@ defmodule EmpiriApi.UserControllerTest do
       second_user_attrs = %{email: "guy@gmail.com", first_name: "Pug", last_name: "Jeremy",
                             organization: "Harvard", title: "President",
                             auth_id: "1234567", auth_provider: "petco"}
-      user1 = Repo.insert! Map.merge(%User{}, @valid_attrs)
+      Repo.insert! Map.merge(%User{}, @valid_attrs)
       user2 = Repo.insert! Map.merge(%User{}, second_user_attrs)
       conn = put conn, user_path(conn, :update, user2.id), Poison.encode!(%{user: %{email: "valid@example.com"}})
       assert json_response(conn, 401)["error"] == "Unauthorized"
