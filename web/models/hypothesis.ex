@@ -23,6 +23,6 @@ defmodule EmpiriApi.Hypothesis do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> cast_assoc(:user_hypotheses)
+    |> cast_assoc(:user_hypotheses, required: true)
   end
 end
