@@ -21,6 +21,7 @@ defmodule EmpiriApi.UserPhotosController do
   end
 
   defp upload_and_render(conn, user, photo) do
+    user = Repo.preload(user, :user_hypotheses)
     changeset = User.changeset(user, %{profile_photo: photo})
 
     case Repo.update(changeset) do

@@ -3,15 +3,17 @@ defmodule EmpiriApi.User do
   use Arc.Ecto.Model
 
   schema "users" do
-    field :first_name, :string
-    field :last_name, :string
-    field :title, :string
-    field :email, :string
-    field :organization, :string
-    field :auth_id, :string
-    field :auth_provider, :string
-    field :external_photo_url, :string
-    field :profile_photo, EmpiriApi.Photo.Type
+    field     :first_name, :string
+    field     :last_name, :string
+    field     :title, :string
+    field     :email, :string
+    field     :organization, :string
+    field     :auth_id, :string
+    field     :auth_provider, :string
+    field     :external_photo_url, :string
+    field     :profile_photo, EmpiriApi.Photo.Type
+    has_many  :user_hypotheses, EmpiriApi.UserHypothesis
+    has_many  :hypotheses, through: [:user_hypotheses, :hypothesis]
 
     timestamps
   end
@@ -31,6 +33,7 @@ defmodule EmpiriApi.User do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> cast_assoc(:user_hypotheses)
     |> cast_attachments(params, @required_file_fields, @optional_file_fields)
     |> validate_format(:email, ~r/@/)
     |> update_change(:email, &String.downcase/1)

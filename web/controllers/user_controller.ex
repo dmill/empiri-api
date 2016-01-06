@@ -34,6 +34,7 @@ defmodule EmpiriApi.UserController do
   end
 
   defp update_and_render(conn, user, user_params) do
+    user = Repo.preload(user, :user_hypotheses)
     changeset = User.changeset(user, user_params)
 
     case Repo.update(changeset) do

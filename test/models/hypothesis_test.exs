@@ -15,4 +15,26 @@ defmodule EmpiriApi.HypothesisTest do
     changeset = Hypothesis.changeset(%Hypothesis{}, @invalid_attrs)
     refute changeset.valid?
   end
+
+  test "defaults 'private' to true" do
+    changeset = Hypothesis.changeset(%Hypothesis{}, @valid_attrs)
+    hypo = Repo.insert!(changeset)
+
+    assert hypo.private == true
+  end
+
+  test "has an association to users" do
+    user_attrs = %{email: "pug@relaxation.com", first_name: "Pug",
+                   last_name: "Jeremy", auth_id: "12345",
+                   organization: "AKC", title: "Overlord",
+                   auth_provider: "petco"}
+
+    user = EmpiriApi.User.changeset(%EmpiriApi.User{}, user_attrs) |> Repo.insert!
+    hypo = EmpiriApi.Hypothesis.changeset(%EmpiriApi.Hypothesis{}, %{title: "titulo"}) |> Repo.insert!
+    Ecto.build_assoc(hypo, :user_hypotheses, user_id: user.id) |> Repo.insert!
+
+    {:ok, hypo_users} = Repo.get(Hypothesis, hypo.id) |> Repo.preload(:users) |> Map.fetch(:users)
+
+    assert Enum.member?(hypo_users, user)
+  end
 end

@@ -42,4 +42,14 @@ defmodule EmpiriApi.UserTest do
     changeset = User.changeset(%User{}, Map.merge(@valid_attrs, %{profile_photo: "string"}))
     refute changeset.valid?
   end
+
+  test "has an association to hypotheses" do
+    user = User.changeset(%User{}, @valid_attrs) |> Repo.insert!
+    hypo = EmpiriApi.Hypothesis.changeset(%EmpiriApi.Hypothesis{}, %{title: "titulo"}) |> Repo.insert!
+    Ecto.build_assoc(user, :user_hypotheses, hypothesis_id: hypo.id) |> Repo.insert!
+
+    {:ok, user_hypos} = Repo.get(User, user.id) |> Repo.preload(:hypotheses) |> Map.fetch(:hypotheses)
+
+    assert Enum.member?(user_hypos, hypo)
+  end
 end

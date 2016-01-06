@@ -120,7 +120,7 @@ defmodule EmpiriApi.UserControllerTest do
     end
 
     test "#{@action}: resource found, data invalid", %{conn: conn, valid_attrs: valid_attrs} do
-      user = Repo.insert! Map.merge(%User{}, @valid_attrs)
+      user = Repo.insert! User.changeset(%User{}, @valid_attrs)
       conn = conn |> put_req_header("content-type", "application/json")
       conn = put conn, user_path(conn, :update, user.id), Poison.encode!(%{user: %{email: "invalid-email-string"}})
       assert json_response(conn, 422)["errors"] != %{}

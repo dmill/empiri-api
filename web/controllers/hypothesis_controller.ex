@@ -5,10 +5,10 @@ defmodule EmpiriApi.HypothesisController do
 
   plug :scrub_params, "hypothesis" when action in [:create, :update]
 
-  def index(conn, _params) do
-    hypotheses = Repo.all(Hypothesis)
-    render(conn, "index.json", hypotheses: hypotheses)
-  end
+  # def index(conn, _params) do
+    # hypotheses = Repo.all(Hypothesis)
+    # render(conn, "index.json", hypotheses: hypotheses)
+  # end
 
   def create(conn, %{"hypothesis" => hypothesis_params}) do
     changeset = Hypothesis.changeset(%Hypothesis{}, hypothesis_params)
