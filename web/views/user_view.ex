@@ -10,11 +10,14 @@ defmodule EmpiriApi.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.id,
+    %{
+      id: user.id,
       first_name: user.first_name,
       last_name: user.last_name,
       title: user.title,
       email: user.email,
-      organization: user.organization}
+      organization: user.organization,
+      photo_url: EmpiriApi.Photo.url({user.profile_photo, user}, :original) || user.external_photo_url
+    }
   end
 end

@@ -45,7 +45,8 @@ defmodule EmpiriApi.UserControllerTest do
         "last_name" => user.last_name,
         "title" => user.title,
         "email" => user.email,
-        "organization" => user.organization}
+        "organization" => user.organization,
+        "photo_url" => nil}
     end
 
     test "#{@action}: #{@context_desc[:existing_record]}, does not insert into db", %{conn: conn} do
@@ -133,7 +134,8 @@ defmodule EmpiriApi.UserControllerTest do
         "last_name" => user.last_name,
         "title" => user.title,
         "email" => "valid@example.com",
-        "organization" => user.organization}
+        "organization" => user.organization,
+        "photo_url" => nil}
     end
   end
 end
