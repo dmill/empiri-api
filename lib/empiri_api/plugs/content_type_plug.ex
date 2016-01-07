@@ -7,7 +7,11 @@ defmodule EmpiriApi.Plugs.ContentTypePlug do
   end
 
   def call(conn, opts \\ nil) do
-    if opts[:multipart_regex] && Regex.match?(opts[:multipart_regex], conn.request_path) do
+    if String.downcase(conn.method) == "get", do: conn, else: validate_content_type(conn, opts)
+  end
+
+  defp validate_content_type(conn, opts) do
+     if opts[:multipart_regex] && Regex.match?(opts[:multipart_regex], conn.request_path) do
       extract_content_type(conn) |> ensure_multipart_content(conn)
     else
       extract_content_type(conn) |> ensure_json_content(conn)
