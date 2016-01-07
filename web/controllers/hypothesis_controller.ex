@@ -2,6 +2,8 @@ defmodule EmpiriApi.HypothesisController do
   use EmpiriApi.Web, :controller
 
   alias EmpiriApi.Hypothesis
+  alias EmpiriApi.User
+  alias EmpiriApi.Plugs.AuthPlug
 
   plug :scrub_params, "hypothesis" when action in [:create, :update]
 
@@ -27,8 +29,12 @@ defmodule EmpiriApi.HypothesisController do
   end
 
   def show(conn, %{"id" => id}) do
-    hypothesis = Repo.get!(Hypothesis, id)
-    render(conn, "show.json", hypothesis: hypothesis)
+    hypothesis = Repo.get!(Hypothesis, id) |> Repo.preload([:user_hypotheses, :users])
+    if hypothesis.private == true do
+      authorize_user(conn, hypothesis)
+    else
+      render(conn, "show.json", hypothesis: hypothesis)
+    end
   end
 
   def update(conn, %{"id" => id, "hypothesis" => hypothesis_params}) do
@@ -53,5 +59,26 @@ defmodule EmpiriApi.HypothesisController do
     Repo.delete!(hypothesis)
 
     send_resp(conn, :no_content, "")
+  end
+
+  defp authorize_user(conn, hypothesis) do
+    conn = AuthPlug.call(conn)
+
+    if conn.halted do
+      conn
+    else
+      conn |> translate_token_claims |> find_user_auth(hypothesis)
+    end
+  end
+
+  defp find_user_auth(conn, hypothesis) do
+    users_auth_creds = hypothesis.users |> Enum.map(fn(user) ->
+                                            %{auth_provider: user.auth_provider, auth_id: user.auth_id} end)
+
+    if Enum.member?(users_auth_creds, %{auth_provider: conn.user[:auth_provider], auth_id: conn.user[:auth_id]}) do
+      render(conn, "show.json", hypothesis: hypothesis)
+    else
+     render_unauthorized(conn)
+    end
   end
 end

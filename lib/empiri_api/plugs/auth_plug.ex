@@ -4,7 +4,7 @@ defmodule EmpiriApi.Plugs.AuthPlug do
     opts
   end
 
-  def call(conn, _opts) do
+  def call(conn, _opts \\ nil) do
     Joken.Plug.call(conn, { &validate_auth_token/0, &unauthorized/2 })
   end
 

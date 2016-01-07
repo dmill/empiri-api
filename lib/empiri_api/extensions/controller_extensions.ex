@@ -14,7 +14,7 @@ defmodule EmpiriApi.Extensions.ControllerExtensions do
     conn |> put_status(:unsupported_media_type) |> render(EmpiriApi.ErrorView, "415.json")
   end
 
-  def translate_token_claims(conn, _) do
+  def translate_token_claims(conn, _ \\ nil) do
     joken_attrs = conn.assigns[:joken_claims]
     [auth_provider, auth_id] = String.split(joken_attrs["sub"], "|")
     Map.merge(conn, %{user: %{auth_provider: auth_provider, auth_id: auth_id,
