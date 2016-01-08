@@ -1,5 +1,6 @@
 defmodule EmpiriApi.Hypothesis do
   use EmpiriApi.Web, :model
+  alias EmpiriApi.Repo
 
   schema "hypotheses" do
     field     :title, :string
@@ -24,5 +25,13 @@ defmodule EmpiriApi.Hypothesis do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> cast_assoc(:user_hypotheses, required: true)
+  end
+
+  def admins(model) do
+    model = model |> Repo.preload([:users, :user_hypotheses])
+    Enum.filter(model.users, fn(user) ->
+                                model.user_hypotheses
+                                |> Enum.find(fn(uh) -> uh.user_id == user.id && uh.admin end)
+                             end)
   end
 end

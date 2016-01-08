@@ -85,18 +85,73 @@ defmodule EmpiriApi.HypothesisControllerTest do
     end
   end
 
+  defmodule CreateContext do
+    use SharedContext
+
+    @action "CREATE"
+
+    setup do
+      conn = conn() |> put_req_header("accept", "application/json")
+      user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                organization: "Harvard", title: "President",
+                                auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
+      {:ok, conn: conn, user: user}
+    end
+
+    test "#{@action}: wrong content-type header", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/xml")
+                  |> post(hypothesis_path(conn, :create))
+
+      assert json_response(conn, 415)["error"] == "Unsupported Media Type"
+    end
+
+    test "#{@action}: no auth header", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> post(hypothesis_path(conn, :create))
+
+      assert json_response(conn, 401)["error"] == "unauthorized"
+    end
+
+    test "#{@action}: no hypothesis param", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+
+       assert_raise Phoenix.MissingParamError, fn ->
+        post(conn, hypothesis_path(conn, :create), Poison.encode!(%{junk: "garbage"}))
+      end
+    end
+
+    test "#{@action}: user not found", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(%{auth_id: 619})}")
+
+      assert_raise Ecto.NoResultsError, fn ->
+        post(conn, hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @valid_attrs}))
+      end
+    end
+
+    test "#{@action}: creates and renders resource when data is valid", %{conn: conn, user: user} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> post(hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @valid_attrs}))
+
+      hypothesis = Repo.get_by(Hypothesis, @valid_attrs) |> Repo.preload([:users, :user_hypotheses])
+
+      assert json_response(conn, 201)["data"]["title"] == "some content"
+      assert hypothesis.users |> Enum.member?(user)
+      assert Hypothesis.admins(hypothesis) |> Enum.member?(user)
+    end
+
+    test "#{@action}: does not create resource and renders errors when data is invalid", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+            |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+            |> post(hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @invalid_attrs}))
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+  end
 
 
-  # test "creates and renders resource when data is valid", %{conn: conn} do
-    # conn = post conn, hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @valid_attrs})
-    # assert json_response(conn, 201)["data"]["id"]
-    # assert Repo.get_by(Hypothesis, @valid_attrs)
-  # end
-#
-  # test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    # conn = post conn, hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @invalid_attrs})
-    # assert json_response(conn, 422)["errors"] != %{}
-  # end
 #
   # test "updates and renders chosen resource when data is valid", %{conn: conn} do
     # hypothesis = Repo.insert! %Hypothesis{}

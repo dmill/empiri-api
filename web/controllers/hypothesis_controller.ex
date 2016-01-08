@@ -3,9 +3,11 @@ defmodule EmpiriApi.HypothesisController do
 
   alias EmpiriApi.Hypothesis
   alias EmpiriApi.User
-  alias EmpiriApi.Plugs.AuthPlug
 
+  plug AuthPlug when action in [:create]
+  plug :translate_token_claims when action in [:create]
   plug :scrub_params, "hypothesis" when action in [:create, :update]
+
 
   # def index(conn, _params) do
     # hypotheses = Repo.all(Hypothesis)
@@ -13,10 +15,13 @@ defmodule EmpiriApi.HypothesisController do
   # end
 
   def create(conn, %{"hypothesis" => hypothesis_params}) do
+    user = Repo.get_by!(User, auth_provider: conn.user[:auth_provider], auth_id: conn.user[:auth_id])
     changeset = Hypothesis.changeset(%Hypothesis{}, hypothesis_params)
 
     case Repo.insert(changeset) do
       {:ok, hypothesis} ->
+        Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: true) |> Repo.insert
+
         conn
         |> put_status(:created)
         |> put_resp_header("location", hypothesis_path(conn, :show, hypothesis))
