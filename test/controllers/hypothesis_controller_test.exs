@@ -24,6 +24,66 @@ defmodule EmpiriApi.HypothesisControllerTest do
     end
   end
 
+  defmodule IndexContext do
+    use SharedContext
+
+    @action "INDEX"
+
+    setup do
+      Enum.each(1..10, fn(x) -> Repo.insert! %Hypothesis{title: "#{x}", deleted: false, private: false} end)
+      private_hypo = Repo.insert!(%Hypothesis{private: true, title: "private"})
+      deleted_hypo = Repo.insert!(%Hypothesis{deleted: true, title: "deleted"})
+
+      conn = conn() |> put_req_header("accept", "application/json")
+      {:ok, conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo}
+    end
+
+    test "#{@action}: without params", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
+      conn = get conn, hypothesis_path(conn, :index)
+
+      resp = Poison.decode!(response(conn, 200))
+
+      assert json_response(conn, 200)["data"]
+      assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
+      assert Enum.count(resp["data"]) == 10
+      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
+    end
+
+    test "#{@action}: without an offset param", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
+      conn = get conn, hypothesis_path(conn, :index, %{limit: 6})
+
+      resp = Poison.decode!(response(conn, 200))
+
+      assert json_response(conn, 200)["data"]
+      assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
+      assert Enum.count(resp["data"]) == 6
+      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
+    end
+
+    test "#{@action}: without a limit param", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
+      conn = get conn, hypothesis_path(conn, :index, %{offset: 2})
+
+      resp = Poison.decode!(response(conn, 200))
+
+      assert json_response(conn, 200)["data"]
+      assert List.first(resp["data"]) |> Map.fetch!("title") == "8"
+      assert Enum.count(resp["data"]) == 8
+      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
+    end
+
+    test "#{@action}: with offset and limit params", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
+      conn = get conn, hypothesis_path(conn, :index, %{offset: 3, limit: 3})
+
+      resp = Poison.decode!(response(conn, 200))
+
+      assert json_response(conn, 200)["data"]
+      assert List.first(resp["data"]) |> Map.fetch!("title") == "7"
+      assert Enum.count(resp["data"]) == 3
+      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
+    end
+  end
+
+
   defmodule ShowContext do
     use SharedContext
 

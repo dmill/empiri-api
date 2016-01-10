@@ -9,10 +9,15 @@ defmodule EmpiriApi.HypothesisController do
   plug :scrub_params, "hypothesis" when action in [:create, :update]
 
 
-  # def index(conn, _params) do
-    # hypotheses = Repo.all(Hypothesis)
-    # render(conn, "index.json", hypotheses: hypotheses)
-  # end
+  def index(conn, params) do
+    hypotheses = Repo.all(from h in Hypothesis,
+                          where: [deleted: false, private: false],
+                          offset: ^(params["offset"] || 0),
+                          limit: ^(params["limit"] || 10),
+                          order_by: [desc: h.id])
+
+    render(conn, "index.json", hypotheses: hypotheses)
+  end
 
   def create(conn, %{"hypothesis" => hypothesis_params}) do
     user = Repo.get_by!(User, auth_provider: conn.user[:auth_provider], auth_id: conn.user[:auth_id])
