@@ -6,13 +6,14 @@ defmodule EmpiriApi.Hypothesis do
     field     :title, :string
     field     :synopsis, :string
     field     :private, :boolean, default: true
+    field     :deleted, :boolean, default: false
     has_many  :user_hypotheses, EmpiriApi.UserHypothesis
     has_many  :users, through: [:user_hypotheses, :user]
 
     timestamps
   end
 
-  @required_fields ~w(title private)
+  @required_fields ~w(title private deleted)
   @optional_fields ~w(synopsis)
 
   @doc """

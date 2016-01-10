@@ -34,7 +34,7 @@ defmodule EmpiriApi.HypothesisController do
   end
 
   def show(conn, %{"id" => id}) do
-    hypothesis = Repo.get!(Hypothesis, id) |> Repo.preload(:users)
+    hypothesis = Repo.get_by!(Hypothesis, id: id, deleted: false) |> Repo.preload(:users)
     if hypothesis.private == true do
       authorize_user(conn, hypothesis)
     else
@@ -43,20 +43,16 @@ defmodule EmpiriApi.HypothesisController do
   end
 
   def update(conn, %{"id" => id, "hypothesis" => hypothesis_params}) do
-    hypothesis = Repo.get!(Hypothesis, id) |> Repo.preload(:users)
+    hypothesis = Repo.get_by!(Hypothesis, id: id, deleted: false) |> Repo.preload(:users)
     authorize_user(conn, hypothesis, hypothesis_params)
   end
 
   def delete(conn, %{"id" => id}) do
-    hypothesis = Repo.get!(Hypothesis, id)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
-    Repo.delete!(hypothesis)
-
-    send_resp(conn, :no_content, "")
+    hypothesis = Repo.get_by!(Hypothesis, id: id, deleted: false) |> Repo.preload(:users)
+    authorize_user(conn, hypothesis)
   end
 
+###################### Private ################################
   defp authorize_user(conn, hypothesis, params \\ nil) do
     conn = AuthPlug.call(conn)
 
@@ -92,6 +88,15 @@ defmodule EmpiriApi.HypothesisController do
           |> put_status(:unprocessable_entity)
           |> render(EmpiriApi.ChangesetView, "error.json", changeset: changeset)
       end
+    else
+      render_unauthorized(conn)
+    end
+  end
+
+  defp perform_private_operation(:delete, conn, hypothesis, _) do
+    if check_admin_status(conn, hypothesis) do
+      Hypothesis.changeset(hypothesis, %{deleted: true}) |> Repo.update!
+      send_resp(conn, :no_content, "")
     else
       render_unauthorized(conn)
     end

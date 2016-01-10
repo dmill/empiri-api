@@ -44,6 +44,15 @@ defmodule EmpiriApi.HypothesisControllerTest do
         "synopsis" => hypothesis.synopsis}
     end
 
+    test "#{@action}: when the hypothesis was deleted", %{conn: conn} do
+      attrs = Map.merge(@valid_attrs, %{private: false, deleted: true})
+      hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, attrs)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        get conn, hypothesis_path(conn, :show, hypothesis.id)
+      end
+    end
+
     test "#{@action}: does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
       assert_raise Ecto.NoResultsError, fn ->
         get conn, hypothesis_path(conn, :show, 13)
@@ -217,7 +226,28 @@ defmodule EmpiriApi.HypothesisControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-      test "updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: user} do
+    test "#{@action}: hypothesis is deleted", %{conn: conn, user: user} do
+      hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title", deleted: true})
+      Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: true) |> Repo.insert
+
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+
+      assert_raise Ecto.NoResultsError, fn ->
+        put(conn, hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @valid_attrs}))
+      end
+    end
+
+    test "#{@action}: hypothesis not found", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+
+      assert_raise Ecto.NoResultsError, fn ->
+        put(conn, hypothesis_path(conn, :update, 32), Poison.encode!(%{hypothesis: @valid_attrs}))
+      end
+    end
+
+      test "#{@action}: updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: user} do
         hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title"})
         Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: true) |> Repo.insert
 
@@ -225,16 +255,82 @@ defmodule EmpiriApi.HypothesisControllerTest do
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
                     |> put(hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @valid_attrs}))
 
-      assert json_response(conn, 200)["data"]["id"]
-      assert Repo.get_by(Hypothesis, @valid_attrs)
-    end
+        assert json_response(conn, 200)["data"]["id"]
+        assert Repo.get_by(Hypothesis, @valid_attrs)
+      end
   end
 
-#
-  # test "deletes chosen resource", %{conn: conn} do
-    # hypothesis = Repo.insert! %Hypothesis{}
-    # conn = delete conn, hypothesis_path(conn, :delete, hypothesis)
-    # assert response(conn, 204)
-    # refute Repo.get(Hypothesis, hypothesis.id)
-  # end
+  defmodule DeleteContext do
+    use SharedContext
+
+    @action "DELETE"
+
+    setup do
+      conn = conn() |> put_req_header("accept", "application/json")
+      user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                organization: "Harvard", title: "President",
+                                auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
+      {:ok, conn: conn, user: user}
+    end
+
+    test "#{@action}: wrong content-type header", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/xml")
+                  |> delete(hypothesis_path(conn, :delete, 33))
+
+      assert json_response(conn, 415)["error"] == "Unsupported Media Type"
+    end
+
+    test "#{@action}: no auth header", %{conn: conn} do
+      hypothesis = Repo.insert! %Hypothesis{}
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> delete(hypothesis_path(conn, :delete, hypothesis))
+
+      assert json_response(conn, 401)["error"] == "unauthorized"
+    end
+
+    test "#{@action}: user not found", %{conn: conn} do
+      hypothesis = Repo.insert! %Hypothesis{}
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> delete(hypothesis_path(conn, :delete, hypothesis))
+
+      assert json_response(conn, 401)["error"] == "Unauthorized"
+    end
+
+    test "#{@action}: user is not an admin", %{conn: conn, user: user} do
+      hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title"})
+      Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: false) |> Repo.insert
+
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> delete(hypothesis_path(conn, :delete, hypothesis))
+
+
+      assert json_response(conn, 401)["error"] == "Unauthorized"
+    end
+
+    test "#{@action}: hypothesis is already deleted", %{conn: conn, user: user} do
+      hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title", deleted: true})
+      Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: true) |> Repo.insert
+
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+
+      assert_raise Ecto.NoResultsError, fn ->
+        delete(conn, hypothesis_path(conn, :delete, hypothesis))
+      end
+    end
+
+    test "#{@action}: soft-deletes the record when user is an admin", %{conn: conn, user: user} do
+      hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title"})
+      Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: true) |> Repo.insert
+
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> delete(hypothesis_path(conn, :delete, hypothesis))
+
+      assert response(conn, 204)
+      assert Repo.get(Hypothesis, hypothesis.id).deleted
+    end
+  end
 end
