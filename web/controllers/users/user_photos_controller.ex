@@ -26,7 +26,7 @@ defmodule EmpiriApi.UserPhotosController do
 
     case Repo.update(changeset) do
       {:ok, user} ->
-        json conn, %{url: "https://#{Photo.url({user.profile_photo, user}, :original)}"}
+        json conn, %{url: EmpiriApi.User.photo_url(user)}
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

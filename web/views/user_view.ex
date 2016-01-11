@@ -17,7 +17,7 @@ defmodule EmpiriApi.UserView do
       title: user.title,
       email: user.email,
       organization: user.organization,
-      photo_url: "https://#{EmpiriApi.Photo.url({user.profile_photo, user}, :original)}" || user.external_photo_url
+      photo_url: EmpiriApi.User.photo_url(user) || user.external_photo_url
     }
   end
 end

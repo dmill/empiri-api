@@ -42,4 +42,9 @@ defmodule EmpiriApi.User do
     |> update_change(:title, &String.capitalize/1)
     |> unique_constraint(:auth_id, name: :users_auth_id_auth_provider_index)
   end
+
+  def photo_url(model) do
+    url = EmpiriApi.Photo.url({model.profile_photo, model}, :original)
+    if url, do: "https://#{url}", else: nil
+  end
 end
