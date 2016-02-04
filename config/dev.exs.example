@@ -11,7 +11,7 @@ config :empiri_api, EmpiriApi.Endpoint,
   debug_errors: true,
   code_reloader: true,
   cache_static_lookup: false,
-  check_origin: false,
+  check_origin: false
 
 # Watch static and templates for browser reloading.
 config :empiri_api, EmpiriApi.Endpoint,
@@ -23,6 +23,20 @@ config :empiri_api, EmpiriApi.Endpoint,
     ]
   ]
 
+config :arc,
+  bucket: "empiri-images",
+  asset_host: "d1zgl05f1mreqj.cloudfront.net",
+  virtual_host: true
+#ex_aws config for AWS credentials
+config :ex_aws,
+  region: "us-west-1",
+  access_key_id: "ask",
+  secret_access_key: "ask",
+  s3: [
+    scheme: "https://",
+    host: "s3-us-west-1.amazonaws.com",
+    region: "us-west-1"
+  ]
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 

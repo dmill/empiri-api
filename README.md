@@ -9,6 +9,10 @@ Development Setup
   - elixir
   - phoenix
 
+setup dev.exs config file:
+
+  $ cp config/dev.exs.example config/dev.exs
+
 Install mix dependencies:
 
     $ mix deps.get
