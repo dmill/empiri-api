@@ -12,8 +12,12 @@ defmodule EmpiriApi.User do
     field     :auth_provider, :string
     field     :external_photo_url, :string
     field     :profile_photo, EmpiriApi.Photo.Type
+
     has_many  :user_hypotheses, EmpiriApi.UserHypothesis
     has_many  :hypotheses, through: [:user_hypotheses, :hypothesis]
+
+    has_many :user_publications, EmpiriApi.UserPublication
+    has_many :publications, through: [:user_publications, :publication]
 
     timestamps
   end

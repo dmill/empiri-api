@@ -52,4 +52,14 @@ defmodule EmpiriApi.UserTest do
 
     assert Enum.member?(user_hypos, hypo)
   end
+
+  test "has an association to publications" do
+    user = User.changeset(%User{}, @valid_attrs) |> Repo.insert!
+    pub = EmpiriApi.Publication.changeset(%EmpiriApi.Publication{}, %{title: "titulo"}) |> Repo.insert!
+    Ecto.build_assoc(user, :user_publications, publication_id: pub.id) |> Repo.insert!
+
+    {:ok, user_pubs} = Repo.get(User, user.id) |> Repo.preload(:publications) |> Map.fetch(:publications)
+
+    assert Enum.member?(user_pubs, pub)
+  end
 end
