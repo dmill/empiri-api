@@ -23,64 +23,64 @@ defmodule SharedContext do
     end
   end
 
-  # defmodule IndexContext do
-    # use SharedContext
-#
-    # @action "INDEX"
-#
-    # setup do
-      # Enum.each(1..10, fn(x) -> Repo.insert! %Hypothesis{title: "#{x}", deleted: false, private: false} end)
-      # private_hypo = Repo.insert!(%Hypothesis{private: true, title: "private"})
-      # deleted_hypo = Repo.insert!(%Hypothesis{deleted: true, title: "deleted"})
-#
-      # conn = conn() |> put_req_header("accept", "application/json")
-      # {:ok, conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo}
-    # end
-#
-    # test "#{@action}: without params", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
-      # conn = get conn, hypothesis_path(conn, :index)
-#
-      # resp = Poison.decode!(response(conn, 200))
-#
-      # assert json_response(conn, 200)["data"]
-      # assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
-      # assert Enum.count(resp["data"]) == 10
-      # refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
-    # end
-#
-    # test "#{@action}: without an offset param", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
-      # conn = get conn, hypothesis_path(conn, :index, %{limit: 6})
-#
-      # resp = Poison.decode!(response(conn, 200))
-#
-      # assert json_response(conn, 200)["data"]
-      # assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
-      # assert Enum.count(resp["data"]) == 6
-      # refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
-    # end
-#
-    # test "#{@action}: without a limit param", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
-      # conn = get conn, hypothesis_path(conn, :index, %{offset: 2})
-#
-      # resp = Poison.decode!(response(conn, 200))
-#
-      # assert json_response(conn, 200)["data"]
-      # assert List.first(resp["data"]) |> Map.fetch!("title") == "8"
-      # assert Enum.count(resp["data"]) == 8
-      # refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
-    # end
-#
-    # test "#{@action}: with offset and limit params", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
-      # conn = get conn, hypothesis_path(conn, :index, %{offset: 3, limit: 3})
-#
-      # resp = Poison.decode!(response(conn, 200))
-#
-      # assert json_response(conn, 200)["data"]
-      # assert List.first(resp["data"]) |> Map.fetch!("title") == "7"
-      # assert Enum.count(resp["data"]) == 3
-      # refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
-    # end
-  # end
+  defmodule IndexContext do
+    use SharedContext
+
+    @action "INDEX"
+
+    setup do
+      Enum.each(1..10, fn(x) -> Repo.insert! %Publication{title: "#{x}", deleted: false, published: true} end)
+      private_pub = Repo.insert!(%Publication{published: false, title: "private"})
+      deleted_pub = Repo.insert!(%Publication{deleted: true, title: "deleted"})
+
+      conn = conn() |> put_req_header("accept", "application/json")
+      {:ok, conn: conn, deleted_pub: deleted_pub, private_pub: private_pub}
+    end
+
+    test "#{@action}: without params", %{conn: conn, deleted_pub: deleted_pub, private_pub: private_pub} do
+      conn = get conn, publication_path(conn, :index)
+
+      resp = Poison.decode!(response(conn, 200))
+
+      assert json_response(conn, 200)["data"]
+      assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
+      assert Enum.count(resp["data"]) == 10
+      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
+    end
+
+    test "#{@action}: without an offset param", %{conn: conn, deleted_pub: deleted_pub, private_pub: private_pub} do
+      conn = get conn, publication_path(conn, :index, %{limit: 6})
+
+      resp = Poison.decode!(response(conn, 200))
+
+      assert json_response(conn, 200)["data"]
+      assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
+      assert Enum.count(resp["data"]) == 6
+      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
+    end
+
+    test "#{@action}: without a limit param", %{conn: conn, deleted_pub: deleted_pub, private_pub: private_pub} do
+      conn = get conn, publication_path(conn, :index, %{offset: 2})
+
+      resp = Poison.decode!(response(conn, 200))
+
+      assert json_response(conn, 200)["data"]
+      assert List.first(resp["data"]) |> Map.fetch!("title") == "8"
+      assert Enum.count(resp["data"]) == 8
+      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
+    end
+
+    test "#{@action}: with offset and limit params", %{conn: conn, deleted_pub: deleted_pub, private_pub: private_pub} do
+      conn = get conn, publication_path(conn, :index, %{offset: 3, limit: 3})
+
+      resp = Poison.decode!(response(conn, 200))
+
+      assert json_response(conn, 200)["data"]
+      assert List.first(resp["data"]) |> Map.fetch!("title") == "7"
+      assert Enum.count(resp["data"]) == 3
+      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
+    end
+  end
 
 
   defmodule ShowContext do
@@ -157,243 +157,243 @@ defmodule SharedContext do
     end
   end
 
-  # defmodule CreateContext do
-    # use SharedContext
-#
-    # @action "CREATE"
-#
-    # setup do
-      # conn = conn() |> put_req_header("accept", "application/json")
-      # user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
-                                # organization: "Harvard", title: "President",
-                                # auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
-      # {:ok, conn: conn, user: user}
-    # end
-#
-    # test "#{@action}: wrong content-type header", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/xml")
-                  # |> post(hypothesis_path(conn, :create))
-#
-      # assert json_response(conn, 415)["error"] == "Unsupported Media Type"
-    # end
-#
-    # test "#{@action}: no auth header", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> post(hypothesis_path(conn, :create))
-#
-      # assert json_response(conn, 401)["error"] == "unauthorized"
-    # end
-#
-    # test "#{@action}: no hypothesis param", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-#
-       # assert_raise Phoenix.MissingParamError, fn ->
-        # post(conn, hypothesis_path(conn, :create), Poison.encode!(%{junk: "garbage"}))
-      # end
-    # end
-#
-    # test "#{@action}: user not found", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(%{auth_id: 619})}")
-#
-      # assert_raise Ecto.NoResultsError, fn ->
-        # post(conn, hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @valid_attrs}))
-      # end
-    # end
-#
-    # test "#{@action}: creates and renders resource when data is valid", %{conn: conn, user: user} do
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  # |> post(hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @valid_attrs}))
-#
-      # hypothesis = Repo.get_by(Hypothesis, @valid_attrs) |> Repo.preload([:users, :user_hypotheses])
-#
-      # assert json_response(conn, 201)["data"]["title"] == "some content"
-      # assert hypothesis.users |> Enum.member?(user)
-      # assert Hypothesis.admins(hypothesis) |> Enum.member?(user)
-    # end
-#
-    # test "#{@action}: does not create resource and renders errors when data is invalid", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/json")
-            # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-            # |> post(hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @invalid_attrs}))
-#
-      # assert json_response(conn, 422)["errors"] != %{}
-    # end
-  # end
-#
-  # defmodule UpdateContext do
-    # use SharedContext
-#
-    # @action "UPDATE"
-#
-    # setup do
-      # conn = conn() |> put_req_header("accept", "application/json")
-      # user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
-                                # organization: "Harvard", title: "President",
-                                # auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
-      # {:ok, conn: conn, user: user}
-    # end
-#
-    # test "#{@action}: wrong content-type header", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/xml")
-                  # |> put(hypothesis_path(conn, :update, 33))
-#
-      # assert json_response(conn, 415)["error"] == "Unsupported Media Type"
-    # end
-#
-    # test "#{@action}: no hypothesis param", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-#
-       # assert_raise Phoenix.MissingParamError, fn ->
-        # put(conn, hypothesis_path(conn, :update, 33), Poison.encode!(%{junk: "garbage"}))
-      # end
-    # end
-#
-    # test "#{@action}: no auth header", %{conn: conn} do
-      # hypothesis = Repo.insert! %Hypothesis{}
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put(hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @valid_attrs}))
-#
-      # assert json_response(conn, 401)["error"] == "unauthorized"
-    # end
-#
-    # test "#{@action}: user not found", %{conn: conn} do
-      # hypothesis = Repo.insert! %Hypothesis{}
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  # |> put(hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @valid_attrs}))
-#
-      # assert json_response(conn, 401)["error"] == "Unauthorized"
-    # end
-#
-    # test "#{@action}: user is not an admin", %{conn: conn, user: user} do
-      # hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title"})
-      # Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: false) |> Repo.insert
-#
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  # |> put(hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @valid_attrs}))
-#
-#
-      # assert json_response(conn, 401)["error"] == "Unauthorized"
-    # end
-#
-    # test "#{@action}: does not create resource and renders errors when data is invalid", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/json")
-            # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-            # |> post(hypothesis_path(conn, :create), Poison.encode!(%{hypothesis: @invalid_attrs}))
-#
-      # assert json_response(conn, 422)["errors"] != %{}
-    # end
-#
-    # test "#{@action}: hypothesis is deleted", %{conn: conn, user: user} do
-      # hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title", deleted: true})
-      # Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: true) |> Repo.insert
-#
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-#
-      # assert_raise Ecto.NoResultsError, fn ->
-        # put(conn, hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @valid_attrs}))
-      # end
-    # end
-#
-    # test "#{@action}: hypothesis not found", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-#
-      # assert_raise Ecto.NoResultsError, fn ->
-        # put(conn, hypothesis_path(conn, :update, 32), Poison.encode!(%{hypothesis: @valid_attrs}))
-      # end
-    # end
-#
-      # test "#{@action}: updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: user} do
-        # hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title"})
-        # Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: true) |> Repo.insert
-#
-        # conn = conn |> put_req_header("content-type", "application/json")
-                    # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                    # |> put(hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @valid_attrs}))
-#
-        # assert json_response(conn, 200)["data"]["id"]
-        # assert Repo.get_by(Hypothesis, @valid_attrs)
-      # end
-  # end
-#
-  # defmodule DeleteContext do
-    # use SharedContext
-#
-    # @action "DELETE"
-#
-    # setup do
-      # conn = conn() |> put_req_header("accept", "application/json")
-      # user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
-                                # organization: "Harvard", title: "President",
-                                # auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
-      # {:ok, conn: conn, user: user}
-    # end
-#
-    # test "#{@action}: wrong content-type header", %{conn: conn} do
-      # conn = conn |> put_req_header("content-type", "application/xml")
-                  # |> delete(hypothesis_path(conn, :delete, 33))
-#
-      # assert json_response(conn, 415)["error"] == "Unsupported Media Type"
-    # end
-#
-    # test "#{@action}: no auth header", %{conn: conn} do
-      # hypothesis = Repo.insert! %Hypothesis{}
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> delete(hypothesis_path(conn, :delete, hypothesis))
-#
-      # assert json_response(conn, 401)["error"] == "unauthorized"
-    # end
-#
-    # test "#{@action}: user not found", %{conn: conn} do
-      # hypothesis = Repo.insert! %Hypothesis{}
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  # |> delete(hypothesis_path(conn, :delete, hypothesis))
-#
-      # assert json_response(conn, 401)["error"] == "Unauthorized"
-    # end
-#
-    # test "#{@action}: user is not an admin", %{conn: conn, user: user} do
-      # hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title"})
-      # Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: false) |> Repo.insert
-#
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  # |> delete(hypothesis_path(conn, :delete, hypothesis))
-#
-#
-      # assert json_response(conn, 401)["error"] == "Unauthorized"
-    # end
-#
-    # test "#{@action}: hypothesis is already deleted", %{conn: conn, user: user} do
-      # hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title", deleted: true})
-      # Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: true) |> Repo.insert
-#
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-#
-      # assert_raise Ecto.NoResultsError, fn ->
-        # delete(conn, hypothesis_path(conn, :delete, hypothesis))
-      # end
-    # end
-#
-    # test "#{@action}: soft-deletes the record when user is an admin", %{conn: conn, user: user} do
-      # hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, %{title: "title"})
-      # Ecto.build_assoc(hypothesis, :user_hypotheses, user_id: user.id, admin: true) |> Repo.insert
-#
-      # conn = conn |> put_req_header("content-type", "application/json")
-                  # |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  # |> delete(hypothesis_path(conn, :delete, hypothesis))
-#
-      # assert response(conn, 204)
-      # assert Repo.get(Hypothesis, hypothesis.id).deleted
-    # end
-  # end
+  defmodule CreateContext do
+    use SharedContext
+
+    @action "CREATE"
+
+    setup do
+      conn = conn() |> put_req_header("accept", "application/json")
+      user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                organization: "Harvard", title: "President",
+                                auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
+      {:ok, conn: conn, user: user}
+    end
+
+    test "#{@action}: wrong content-type header", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/xml")
+                  |> post(publication_path(conn, :create))
+
+      assert json_response(conn, 415)["error"] == "Unsupported Media Type"
+    end
+
+    test "#{@action}: no auth header", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> post(publication_path(conn, :create))
+
+      assert json_response(conn, 401)["error"] == "unauthorized"
+    end
+
+    test "#{@action}: no publication param", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+
+       assert_raise Phoenix.MissingParamError, fn ->
+        post(conn, publication_path(conn, :create), Poison.encode!(%{junk: "garbage"}))
+      end
+    end
+
+    test "#{@action}: user not found", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(%{auth_id: 619})}")
+
+      assert_raise Ecto.NoResultsError, fn ->
+        post(conn, publication_path(conn, :create), Poison.encode!(%{publication: @valid_attrs}))
+      end
+    end
+
+    test "#{@action}: creates and renders resource when data is valid", %{conn: conn, user: user} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> post(publication_path(conn, :create), Poison.encode!(%{publication: @valid_attrs}))
+
+      publication = Repo.get_by(Publication, @valid_attrs) |> Repo.preload([:users, :user_publications])
+
+      assert json_response(conn, 201)["data"]["title"] == "some content"
+      assert publication.users |> Enum.member?(user)
+      assert Publication.admins(publication) |> Enum.member?(user)
+    end
+
+    test "#{@action}: does not create resource and renders errors when data is invalid", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+            |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+            |> post(publication_path(conn, :create), Poison.encode!(%{publication: @invalid_attrs}))
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+  end
+
+  defmodule UpdateContext do
+    use SharedContext
+
+    @action "UPDATE"
+
+    setup do
+      conn = conn() |> put_req_header("accept", "application/json")
+      user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                organization: "Harvard", title: "President",
+                                auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
+      {:ok, conn: conn, user: user}
+    end
+
+    test "#{@action}: wrong content-type header", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/xml")
+                  |> put(publication_path(conn, :update, 33))
+
+      assert json_response(conn, 415)["error"] == "Unsupported Media Type"
+    end
+
+    test "#{@action}: no publication param", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+
+       assert_raise Phoenix.MissingParamError, fn ->
+        put(conn, publication_path(conn, :update, 33), Poison.encode!(%{junk: "garbage"}))
+      end
+    end
+
+    test "#{@action}: no auth header", %{conn: conn} do
+      publication = Repo.insert! %Publication{}
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
+
+      assert json_response(conn, 401)["error"] == "unauthorized"
+    end
+
+    test "#{@action}: user not found", %{conn: conn} do
+      publication = Repo.insert! %Publication{}
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
+
+      assert json_response(conn, 401)["error"] == "Unauthorized"
+    end
+
+    test "#{@action}: user is not an admin", %{conn: conn, user: user} do
+      publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title"})
+      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: false) |> Repo.insert
+
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
+
+
+      assert json_response(conn, 401)["error"] == "Unauthorized"
+    end
+
+    test "#{@action}: does not update resource and renders errors when data is invalid", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+            |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+            |> post(publication_path(conn, :create), Poison.encode!(%{publication: @invalid_attrs}))
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "#{@action}: publication is deleted", %{conn: conn, user: user} do
+      publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title", deleted: true})
+      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true) |> Repo.insert
+
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+
+      assert_raise Ecto.NoResultsError, fn ->
+        put(conn, publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
+      end
+    end
+
+    test "#{@action}: publication not found", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+
+      assert_raise Ecto.NoResultsError, fn ->
+        put(conn, publication_path(conn, :update, 32), Poison.encode!(%{publication: @valid_attrs}))
+      end
+    end
+
+      test "#{@action}: updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: user} do
+        publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title"})
+        Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true) |> Repo.insert
+
+        conn = conn |> put_req_header("content-type", "application/json")
+                    |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                    |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
+
+        assert json_response(conn, 200)["data"]["id"]
+        assert Repo.get_by(Publication, @valid_attrs)
+      end
+  end
+
+  defmodule DeleteContext do
+    use SharedContext
+
+    @action "DELETE"
+
+    setup do
+      conn = conn() |> put_req_header("accept", "application/json")
+      user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                organization: "Harvard", title: "President",
+                                auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
+      {:ok, conn: conn, user: user}
+    end
+
+    test "#{@action}: wrong content-type header", %{conn: conn} do
+      conn = conn |> put_req_header("content-type", "application/xml")
+                  |> delete(publication_path(conn, :delete, 33))
+
+      assert json_response(conn, 415)["error"] == "Unsupported Media Type"
+    end
+
+    test "#{@action}: no auth header", %{conn: conn} do
+      publication = Repo.insert! %Publication{}
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> delete(publication_path(conn, :delete, publication))
+
+      assert json_response(conn, 401)["error"] == "unauthorized"
+    end
+
+    test "#{@action}: user not found", %{conn: conn} do
+      publication = Repo.insert! %Publication{}
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> delete(publication_path(conn, :delete, publication))
+
+      assert json_response(conn, 401)["error"] == "Unauthorized"
+    end
+
+    test "#{@action}: user is not an admin", %{conn: conn, user: user} do
+      publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title"})
+      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: false) |> Repo.insert
+
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> delete(publication_path(conn, :delete, publication))
+
+
+      assert json_response(conn, 401)["error"] == "Unauthorized"
+    end
+
+    test "#{@action}: publication is already deleted", %{conn: conn, user: user} do
+      publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title", deleted: true})
+      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true) |> Repo.insert
+
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+
+      assert_raise Ecto.NoResultsError, fn ->
+        delete(conn, publication_path(conn, :delete, publication))
+      end
+    end
+
+    test "#{@action}: soft-deletes the record when user is an admin", %{conn: conn, user: user} do
+      publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title"})
+      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true) |> Repo.insert
+
+      conn = conn |> put_req_header("content-type", "application/json")
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> delete(publication_path(conn, :delete, publication))
+
+      assert response(conn, 204)
+      assert Repo.get(Publication, publication.id).deleted
+    end
+  end
 end

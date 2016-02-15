@@ -4,7 +4,7 @@ defmodule EmpiriApi.UserPublicationTest do
   alias EmpiriApi.UserPublication
 
   @valid_attrs %{admin: true}
-  @invalid_attrs %{}
+  @invalid_attrs %{admin: nil}
 
   test "changeset with valid attributes" do
     changeset = UserPublication.changeset(%UserPublication{}, @valid_attrs)
