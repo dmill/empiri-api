@@ -13,7 +13,6 @@ defmodule EmpiriApi.PublicationView do
     %{id: publication.id,
       title: publication.title,
       abstract: publication.abstract,
-      published: publication.published,
-      deleted: publication.deleted}
+      published: publication.published}
   end
 end
