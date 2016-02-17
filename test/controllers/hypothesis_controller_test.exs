@@ -43,10 +43,10 @@ defmodule EmpiriApi.HypothesisControllerTest do
 
       resp = Poison.decode!(response(conn, 200))
 
-      assert json_response(conn, 200)["data"]
-      assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
-      assert Enum.count(resp["data"]) == 10
-      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
+      assert json_response(conn, 200)["hypotheses"]
+      assert List.first(resp["hypotheses"]) |> Map.fetch!("title") == "10"
+      assert Enum.count(resp["hypotheses"]) == 10
+      refute Enum.find(resp["hypotheses"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
     end
 
     test "#{@action}: without an offset param", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
@@ -54,10 +54,10 @@ defmodule EmpiriApi.HypothesisControllerTest do
 
       resp = Poison.decode!(response(conn, 200))
 
-      assert json_response(conn, 200)["data"]
-      assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
-      assert Enum.count(resp["data"]) == 6
-      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
+      assert json_response(conn, 200)["hypotheses"]
+      assert List.first(resp["hypotheses"]) |> Map.fetch!("title") == "10"
+      assert Enum.count(resp["hypotheses"]) == 6
+      refute Enum.find(resp["hypotheses"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
     end
 
     test "#{@action}: without a limit param", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
@@ -65,10 +65,10 @@ defmodule EmpiriApi.HypothesisControllerTest do
 
       resp = Poison.decode!(response(conn, 200))
 
-      assert json_response(conn, 200)["data"]
-      assert List.first(resp["data"]) |> Map.fetch!("title") == "8"
-      assert Enum.count(resp["data"]) == 8
-      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
+      assert json_response(conn, 200)["hypotheses"]
+      assert List.first(resp["hypotheses"]) |> Map.fetch!("title") == "8"
+      assert Enum.count(resp["hypotheses"]) == 8
+      refute Enum.find(resp["hypotheses"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
     end
 
     test "#{@action}: with offset and limit params", %{conn: conn, deleted_hypo: deleted_hypo, private_hypo: private_hypo} do
@@ -76,10 +76,10 @@ defmodule EmpiriApi.HypothesisControllerTest do
 
       resp = Poison.decode!(response(conn, 200))
 
-      assert json_response(conn, 200)["data"]
-      assert List.first(resp["data"]) |> Map.fetch!("title") == "7"
-      assert Enum.count(resp["data"]) == 3
-      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
+      assert json_response(conn, 200)["hypotheses"]
+      assert List.first(resp["hypotheses"]) |> Map.fetch!("title") == "7"
+      assert Enum.count(resp["hypotheses"]) == 3
+      refute Enum.find(resp["hypotheses"], fn(x) -> x["title"] == deleted_hypo.title || x["title"] == private_hypo.title end)
     end
   end
 
@@ -99,7 +99,7 @@ defmodule EmpiriApi.HypothesisControllerTest do
       hypothesis = Repo.insert! Hypothesis.changeset(%Hypothesis{}, attrs)
       conn = get conn, hypothesis_path(conn, :show, hypothesis.id)
 
-      assert json_response(conn, 200)["data"] == %{"id" => hypothesis.id,
+      assert json_response(conn, 200)["hypothesis"] == %{"id" => hypothesis.id,
         "title" => hypothesis.title,
         "synopsis" => hypothesis.synopsis}
     end
@@ -148,7 +148,7 @@ defmodule EmpiriApi.HypothesisControllerTest do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
       conn = get conn, hypothesis_path(conn, :show, hypothesis.id)
 
-      assert json_response(conn, 200)["data"] == %{"id" => hypothesis.id,
+      assert json_response(conn, 200)["hypothesis"] == %{"id" => hypothesis.id,
         "title" => hypothesis.title,
         "synopsis" => hypothesis.synopsis}
     end
@@ -206,7 +206,7 @@ defmodule EmpiriApi.HypothesisControllerTest do
 
       hypothesis = Repo.get_by(Hypothesis, @valid_attrs) |> Repo.preload([:users, :user_hypotheses])
 
-      assert json_response(conn, 201)["data"]["title"] == "some content"
+      assert json_response(conn, 201)["hypothesis"]["title"] == "some content"
       assert hypothesis.users |> Enum.member?(user)
       assert Hypothesis.admins(hypothesis) |> Enum.member?(user)
     end
@@ -315,7 +315,7 @@ defmodule EmpiriApi.HypothesisControllerTest do
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
                     |> put(hypothesis_path(conn, :update, hypothesis), Poison.encode!(%{hypothesis: @valid_attrs}))
 
-        assert json_response(conn, 200)["data"]["id"]
+        assert json_response(conn, 200)["hypothesis"]["id"]
         assert Repo.get_by(Hypothesis, @valid_attrs)
       end
   end

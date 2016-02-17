@@ -42,10 +42,10 @@ defmodule SharedContext do
 
       resp = Poison.decode!(response(conn, 200))
 
-      assert json_response(conn, 200)["data"]
-      assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
-      assert Enum.count(resp["data"]) == 10
-      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
+      assert json_response(conn, 200)["publications"]
+      assert List.first(resp["publications"]) |> Map.fetch!("title") == "10"
+      assert Enum.count(resp["publications"]) == 10
+      refute Enum.find(resp["publications"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
     end
 
     test "#{@action}: without an offset param", %{conn: conn, deleted_pub: deleted_pub, private_pub: private_pub} do
@@ -53,10 +53,10 @@ defmodule SharedContext do
 
       resp = Poison.decode!(response(conn, 200))
 
-      assert json_response(conn, 200)["data"]
-      assert List.first(resp["data"]) |> Map.fetch!("title") == "10"
-      assert Enum.count(resp["data"]) == 6
-      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
+      assert json_response(conn, 200)["publications"]
+      assert List.first(resp["publications"]) |> Map.fetch!("title") == "10"
+      assert Enum.count(resp["publications"]) == 6
+      refute Enum.find(resp["publications"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
     end
 
     test "#{@action}: without a limit param", %{conn: conn, deleted_pub: deleted_pub, private_pub: private_pub} do
@@ -64,10 +64,10 @@ defmodule SharedContext do
 
       resp = Poison.decode!(response(conn, 200))
 
-      assert json_response(conn, 200)["data"]
-      assert List.first(resp["data"]) |> Map.fetch!("title") == "8"
-      assert Enum.count(resp["data"]) == 8
-      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
+      assert json_response(conn, 200)["publications"]
+      assert List.first(resp["publications"]) |> Map.fetch!("title") == "8"
+      assert Enum.count(resp["publications"]) == 8
+      refute Enum.find(resp["publications"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
     end
 
     test "#{@action}: with offset and limit params", %{conn: conn, deleted_pub: deleted_pub, private_pub: private_pub} do
@@ -75,10 +75,10 @@ defmodule SharedContext do
 
       resp = Poison.decode!(response(conn, 200))
 
-      assert json_response(conn, 200)["data"]
-      assert List.first(resp["data"]) |> Map.fetch!("title") == "7"
-      assert Enum.count(resp["data"]) == 3
-      refute Enum.find(resp["data"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
+      assert json_response(conn, 200)["publications"]
+      assert List.first(resp["publications"]) |> Map.fetch!("title") == "7"
+      assert Enum.count(resp["publications"]) == 3
+      refute Enum.find(resp["publications"], fn(x) -> x["title"] == deleted_pub.title || x["title"] == private_pub.title end)
     end
   end
 
@@ -98,7 +98,7 @@ defmodule SharedContext do
       publication = Repo.insert! Publication.changeset(%Publication{}, attrs)
       conn = get conn, publication_path(conn, :show, publication.id)
 
-      assert json_response(conn, 200)["data"] == %{"id" => publication.id,
+      assert json_response(conn, 200)["publication"] == %{"id" => publication.id,
         "title" => publication.title,
         "published" => true,
         "abstract" => "some dope text"
@@ -149,7 +149,7 @@ defmodule SharedContext do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
       conn = get conn, publication_path(conn, :show, publication.id)
 
-      assert json_response(conn, 200)["data"] == %{"id" => publication.id,
+      assert json_response(conn, 200)["publication"] == %{"id" => publication.id,
         "title" => publication.title,
         "published" => false,
         "abstract" => nil
@@ -209,7 +209,7 @@ defmodule SharedContext do
 
       publication = Repo.get_by(Publication, @valid_attrs) |> Repo.preload([:users, :user_publications])
 
-      assert json_response(conn, 201)["data"]["title"] == "some content"
+      assert json_response(conn, 201)["publication"]["title"] == "some content"
       assert publication.users |> Enum.member?(user)
       assert Publication.admins(publication) |> Enum.member?(user)
     end
@@ -318,7 +318,7 @@ defmodule SharedContext do
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
                     |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
 
-        assert json_response(conn, 200)["data"]["id"]
+        assert json_response(conn, 200)["publication"]["id"]
         assert Repo.get_by(Publication, @valid_attrs)
       end
   end

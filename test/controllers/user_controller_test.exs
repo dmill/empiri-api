@@ -40,7 +40,7 @@ defmodule EmpiriApi.UserControllerTest do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
       user = Repo.insert! Map.merge(%User{},@valid_attrs)
       conn = get conn, user_path(conn, :show)
-      assert json_response(conn, 200)["data"] == %{"id" => user.id,
+      assert json_response(conn, 200)["user"] == %{"id" => user.id,
         "first_name" => user.first_name,
         "last_name" => user.last_name,
         "title" => user.title,
@@ -86,7 +86,7 @@ defmodule EmpiriApi.UserControllerTest do
     test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:valid]}, returns user data", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
       conn = get conn, user_path(conn, :show)
-      assert json_response(conn, 200)["data"]["first_name"] == @valid_params[:given_name]
+      assert json_response(conn, 200)["user"]["first_name"] == @valid_params[:given_name]
 
     end
   end
@@ -129,7 +129,7 @@ defmodule EmpiriApi.UserControllerTest do
     test "#{@action}: resource found, data is valid", %{conn: conn, valid_attrs: valid_attrs} do
       user  = Repo.insert! Map.merge(%User{}, @valid_attrs)
       conn = put conn, user_path(conn, :update, user.id), Poison.encode!(%{user: %{email: "valid@example.com"}})
-      assert json_response(conn, 200)["data"] == %{"id" => user.id,
+      assert json_response(conn, 200)["user"] == %{"id" => user.id,
         "first_name" => user.first_name,
         "last_name" => user.last_name,
         "title" => user.title,
