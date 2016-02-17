@@ -115,7 +115,7 @@ defmodule SharedContext do
 
       conn = get conn, publication_path(conn, :show, publication.id)
 
-      assert json_response(conn, 401)["error"] == "unauthorized"
+      assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
     test "#{@action}: when the publication has not been published, 401 if the user is not authorized" do
@@ -247,7 +247,7 @@ defmodule SharedContext do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
 
-      assert json_response(conn, 401)["error"] == "unauthorized"
+      assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
     test "#{@action}: user not found", %{conn: conn} do
@@ -338,7 +338,7 @@ defmodule SharedContext do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> delete(publication_path(conn, :delete, publication))
 
-      assert json_response(conn, 401)["error"] == "unauthorized"
+      assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
     test "#{@action}: user not found", %{conn: conn} do
