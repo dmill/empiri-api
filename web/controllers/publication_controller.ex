@@ -13,7 +13,8 @@ defmodule EmpiriApi.PublicationController do
                           where: [deleted: false, published: true],
                           offset: ^(params["offset"] || 0),
                           limit: ^(params["limit"] || 10),
-                          order_by: [desc: p.id])
+                          order_by: [desc: p.id],
+                          preload: [:users])
 
     render(conn, "index.json", publications: publications)
   end
@@ -29,7 +30,7 @@ defmodule EmpiriApi.PublicationController do
         conn
         |> put_status(:created)
         |> put_resp_header("location", publication_path(conn, :show, publication))
-        |> render("show.json", publication: publication)
+        |> render("show.json", publication: Repo.preload(publication, :users))
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

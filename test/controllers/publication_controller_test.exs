@@ -93,18 +93,6 @@ defmodule SharedContext do
       {:ok, conn: conn}
     end
 
-    test "#{@action}: shows chosen resource", %{conn: conn} do
-      attrs = Map.merge(@valid_attrs, %{published: true, abstract: "some dope text"})
-      publication = Repo.insert! Publication.changeset(%Publication{}, attrs)
-      conn = get conn, publication_path(conn, :show, publication.id)
-
-      assert json_response(conn, 200)["publication"] == %{"id" => publication.id,
-        "title" => publication.title,
-        "published" => true,
-        "abstract" => "some dope text"
-      }
-    end
-
     test "#{@action}: when the publication was deleted", %{conn: conn} do
       attrs = Map.merge(@valid_attrs, %{published: true, deleted: true})
       publication = Repo.insert! Publication.changeset(%Publication{}, attrs)
@@ -149,11 +137,11 @@ defmodule SharedContext do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
       conn = get conn, publication_path(conn, :show, publication.id)
 
-      assert json_response(conn, 200)["publication"] == %{"id" => publication.id,
-        "title" => publication.title,
-        "published" => false,
-        "abstract" => nil
-      }
+      assert json_response(conn, 200)["publication"]["id"] == publication.id
+      assert json_response(conn, 200)["publication"]["admin_ids"]
+      assert json_response(conn, 200)["publication"]["_embedded"]["users"] |>
+             Enum.map(fn(u) -> u["id"] end) |>
+             Enum.member?(user.id)
     end
   end
 
