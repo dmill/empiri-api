@@ -12,27 +12,28 @@ defmodule EmpiriApi.PublicationView do
   end
 
   def render("publication.json", %{publication: publication}) do
-    %{
-      id: publication.id,
-      title: publication.title,
-      abstract: publication.abstract,
-      published: publication.published,
-      admin_ids: admin_ids(publication)
-    } |> Map.merge(render_embedded(publication))
+    base_publication(publication) |> Map.merge(render_embedded(publication))
   end
 
   def render("abbreviated_publication.json", %{publication: publication}) do
-    %{
-      id: publication.id,
-      title: publication.title,
-      abstract: publication.abstract,
-      published: publication.published,
-    } |> Map.merge(render_abbrev_embedded(publication))
+    base_publication(publication) |> Map.merge(render_abbrev_embedded(publication))
   end
 
   defp render_abbrev_embedded(publication) do
     %{
       _embedded: UserView.render("index.json", %{users: publication.users})
+    }
+  end
+
+  defp base_publication(publication) do
+    %{
+      id: publication.id,
+      title: publication.title,
+      abstract: publication.abstract,
+      published: publication.published,
+      first_author_id: publication.first_author_id,
+      last_author_id: publication.last_author_id,
+      admin_ids: admin_ids(publication)
     }
   end
 

@@ -3,7 +3,7 @@ defmodule EmpiriApi.PublicationTest do
 
   alias EmpiriApi.Publication
 
-  @valid_attrs %{title: "some content"}
+  @valid_attrs %{title: "some content", first_author_id: 1, last_author_id: 2}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

@@ -8,7 +8,7 @@ defmodule SharedContext do
         alias EmpiriApi.User
         alias EmpiriApi.Publication
 
-        @valid_attrs %{title: "some content"}
+        @valid_attrs %{title: "some content", last_author_id: 1, first_author_id: 2}
 
         @invalid_attrs %{title: nil}
 
@@ -139,6 +139,8 @@ defmodule SharedContext do
 
       assert json_response(conn, 200)["publication"]["id"] == publication.id
       assert json_response(conn, 200)["publication"]["admin_ids"]
+      assert json_response(conn, 200)["publication"]["first_author_id"]
+      assert json_response(conn, 200)["publication"]["last_author_id"]
       assert json_response(conn, 200)["publication"]["_embedded"]["users"] |>
              Enum.map(fn(u) -> u["id"] end) |>
              Enum.member?(user.id)

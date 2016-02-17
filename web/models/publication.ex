@@ -7,6 +7,9 @@ defmodule EmpiriApi.Publication do
     field :abstract, :string
     field :published, :boolean, default: false
     field :deleted, :boolean, default: false
+    field :first_author_id, :integer
+    field :last_author_id, :integer
+
     has_many  :user_publications, EmpiriApi.UserPublication
     has_many  :users, through: [:user_publications, :user]
 
@@ -14,7 +17,7 @@ defmodule EmpiriApi.Publication do
   end
 
   @required_fields ~w(title published deleted)
-  @optional_fields ~w(abstract)
+  @optional_fields ~w(abstract first_author_id last_author_id)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
