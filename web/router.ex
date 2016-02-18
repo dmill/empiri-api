@@ -21,6 +21,8 @@ defmodule EmpiriApi.Router do
 
     resources "/hypotheses", HypothesisController, except: [:edit, :new]
 
-    resources "/publications", PublicationController, except: [:edit, :new]
+    resources "/publications", PublicationController, except: [:edit, :new] do
+      resources "/authors", AuthorController, only: [:create, :update, :delete]
+    end
   end
 end

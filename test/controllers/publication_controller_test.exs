@@ -133,6 +133,12 @@ defmodule SharedContext do
       publication = Publication.changeset(%Publication{}, @valid_attrs) |> Repo.insert!
       user = User.changeset(%User{}, @user_attrs) |> Repo.insert!
       Ecto.build_assoc(publication, :user_publications, user_id: user.id) |> Repo.insert!
+      Ecto.build_assoc(publication, :authors, first_name: "Buster",
+                                              last_name: "Garcia",
+                                              title: "pug",
+                                              organization: "petco",
+                                              email: "pug@petco.com") |> Repo.insert!
+
 
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
       conn = get conn, publication_path(conn, :show, publication.id)
@@ -141,6 +147,7 @@ defmodule SharedContext do
       assert json_response(conn, 200)["publication"]["admin_ids"]
       assert json_response(conn, 200)["publication"]["first_author_id"]
       assert json_response(conn, 200)["publication"]["last_author_id"]
+      assert json_response(conn, 200)["publication"]["_embedded"]["authors"] |> List.first |> Map.get("first_name") == "Buster"
       assert json_response(conn, 200)["publication"]["_embedded"]["users"] |>
              Enum.map(fn(u) -> u["id"] end) |>
              Enum.member?(user.id)

@@ -12,6 +12,7 @@ defmodule EmpiriApi.Publication do
 
     has_many  :user_publications, EmpiriApi.UserPublication
     has_many  :users, through: [:user_publications, :user]
+    has_many  :authors, EmpiriApi.Author
 
     timestamps
   end
@@ -29,6 +30,7 @@ defmodule EmpiriApi.Publication do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> cast_assoc(:user_publications, required: true)
+    |> cast_assoc(:authors)
   end
 
   def admins(model) do
