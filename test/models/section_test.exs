@@ -3,7 +3,7 @@ defmodule EmpiriApi.SectionTest do
 
   alias EmpiriApi.Section
 
-  @valid_attrs %{body: "some content", index: 42, title: "some content"}
+  @valid_attrs %{body: "some content", position: 42, title: "some content"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

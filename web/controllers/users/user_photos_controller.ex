@@ -1,7 +1,6 @@
 defmodule EmpiriApi.UserPhotosController do
   use EmpiriApi.Web, :controller
   alias EmpiriApi.User
-  alias EmpiriApi.Photo
 
   plug :scrub_params, "photo" when action in [:create, :update]
   plug AuthenticationPlug

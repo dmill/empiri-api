@@ -1,4 +1,4 @@
-defmodule EmpiriApi.Photo do
+defmodule EmpiriApi.ProfilePhoto do
   use Arc.Definition
   use Arc.Ecto.Definition
 

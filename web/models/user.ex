@@ -11,7 +11,7 @@ defmodule EmpiriApi.User do
     field     :auth_id, :string
     field     :auth_provider, :string
     field     :external_photo_url, :string
-    field     :profile_photo, EmpiriApi.Photo.Type
+    field     :profile_photo, EmpiriApi.ProfilePhoto.Type
 
     has_many  :user_hypotheses, EmpiriApi.UserHypothesis
     has_many  :hypotheses, through: [:user_hypotheses, :hypothesis]
@@ -48,7 +48,7 @@ defmodule EmpiriApi.User do
   end
 
   def photo_url(model) do
-    url = EmpiriApi.Photo.url({model.profile_photo, model}, :original)
+    url = EmpiriApi.ProfilePhoto.url({model.profile_photo, model}, :original)
     if url, do: "https://#{url}", else: nil
   end
 end

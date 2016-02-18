@@ -4,13 +4,13 @@ defmodule EmpiriApi.Section do
   schema "sections" do
     field :title, :string
     field :body, :string
-    field :index, :integer
+    field :position, :integer
     belongs_to :publication, EmpiriApi.Publication
 
     timestamps
   end
 
-  @required_fields ~w(title index)
+  @required_fields ~w(title position)
   @optional_fields ~w(body)
 
   @doc """

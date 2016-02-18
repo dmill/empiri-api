@@ -63,7 +63,7 @@ defmodule EmpiriApi.UserPhotosControllerTest do
     end
 
     test "#{@action}: resource found, photo is valid, error uploading to S3", %{conn: conn} do
-      with_mock EmpiriApi.Photo, [store: fn(_args) -> {:error, ["unauthorized"]} end] do
+      with_mock EmpiriApi.ProfilePhoto, [store: fn(_args) -> {:error, ["unauthorized"]} end] do
         user = Repo.insert! Map.merge(%User{}, @valid_attrs)
         {:ok, photo_path} = Plug.Upload.random_file("testing")
         photo = File.read(photo_path)
@@ -75,7 +75,7 @@ defmodule EmpiriApi.UserPhotosControllerTest do
     end
 
     test "#{@action}: resource found, photo is valid, success uploading to S3", %{conn: conn} do
-      with_mock EmpiriApi.Photo, [:passthrough], [store: fn(_args) -> {:ok, "filename.png"} end] do
+      with_mock EmpiriApi.ProfilePhoto, [:passthrough], [store: fn(_args) -> {:ok, "filename.png"} end] do
         user = Repo.insert! Map.merge(%User{}, @valid_attrs)
         {:ok, photo_path} = Plug.Upload.random_file("testing")
         photo = File.read(photo_path)

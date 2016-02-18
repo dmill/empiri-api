@@ -13,7 +13,7 @@ defmodule EmpiriApi.SectionView do
     %{id: section.id,
       title: section.title,
       body: section.body,
-      index: section.index,
+      position: section.position,
       publication_id: section.publication_id}
   end
 end
