@@ -30,7 +30,7 @@ defmodule EmpiriApi.PublicationController do
         conn
         |> put_status(:created)
         |> put_resp_header("location", publication_path(conn, :show, publication))
-        |> render("show.json", publication: Repo.preload(publication, [:users, :authors]))
+        |> render("show.json", publication: Repo.preload(publication, [:users, :authors, :sections]))
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -39,7 +39,7 @@ defmodule EmpiriApi.PublicationController do
   end
 
   def show(conn, %{"id" => id}) do
-    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors])
+    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors, :sections])
     if !publication.published do
       authorize_user(conn, publication)
     else
@@ -48,12 +48,12 @@ defmodule EmpiriApi.PublicationController do
   end
 
   def update(conn, %{"id" => id, "publication" => publication_params}) do
-    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors])
+    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors, :sections])
     new_authorize_user(conn, publication, publication_params)
   end
 
   def delete(conn, %{"id" => id}) do
-    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors])
+    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors, :sections])
     new_authorize_user(conn, publication)
   end
 ###################### Private ################################

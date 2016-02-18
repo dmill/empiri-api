@@ -2,11 +2,11 @@ defmodule EmpiriApi.SectionView do
   use EmpiriApi.Web, :view
 
   def render("index.json", %{sections: sections}) do
-    %{data: render_many(sections, EmpiriApi.SectionView, "section.json")}
+    %{sections: render_many(sections, EmpiriApi.SectionView, "section.json")}
   end
 
   def render("show.json", %{section: section}) do
-    %{data: render_one(section, EmpiriApi.SectionView, "section.json")}
+    %{section: render_one(section, EmpiriApi.SectionView, "section.json")}
   end
 
   def render("section.json", %{section: section}) do
