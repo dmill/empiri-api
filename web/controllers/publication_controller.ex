@@ -4,8 +4,8 @@ defmodule EmpiriApi.PublicationController do
   alias EmpiriApi.Publication
   alias EmpiriApi.User
 
-  plug AuthPlug when action in [:create]
-  plug :translate_token_claims when action in [:create]
+  plug AuthenticationPlug when action in [:create, :update, :delete]
+  plug :translate_token_claims when action in [:create, :update, :delete]
   plug :scrub_params, "publication" when action in [:create, :update]
 
   def index(conn, params) do
@@ -49,22 +49,26 @@ defmodule EmpiriApi.PublicationController do
 
   def update(conn, %{"id" => id, "publication" => publication_params}) do
     publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload(:users)
-    authorize_user(conn, publication, publication_params)
+    new_authorize_user(conn, publication, publication_params)
   end
 
   def delete(conn, %{"id" => id}) do
     publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload(:users)
-    authorize_user(conn, publication)
+    new_authorize_user(conn, publication)
   end
 ###################### Private ################################
   defp authorize_user(conn, publication, params \\ nil) do
-    conn = AuthPlug.call(conn)
+    conn = AuthenticationPlug.call(conn)
 
     if conn.halted do
       conn
     else
       conn |> translate_token_claims |> find_user_auth(publication, params)
     end
+  end
+
+  defp new_authorize_user(conn, publication, params \\ nil) do
+    conn |> find_user_auth(publication, params)
   end
 
   defp find_user_auth(conn, publication, params) do

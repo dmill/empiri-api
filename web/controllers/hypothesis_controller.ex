@@ -4,7 +4,7 @@ defmodule EmpiriApi.HypothesisController do
   alias EmpiriApi.Hypothesis
   alias EmpiriApi.User
 
-  plug AuthPlug when action in [:create]
+  plug AuthenticationPlug when action in [:create]
   plug :translate_token_claims when action in [:create]
   plug :scrub_params, "hypothesis" when action in [:create, :update]
 
@@ -59,7 +59,7 @@ defmodule EmpiriApi.HypothesisController do
 
 ###################### Private ################################
   defp authorize_user(conn, hypothesis, params \\ nil) do
-    conn = AuthPlug.call(conn)
+    conn = AuthenticationPlug.call(conn)
 
     if conn.halted do
       conn

@@ -4,7 +4,7 @@ defmodule EmpiriApi.UserPhotosController do
   alias EmpiriApi.Photo
 
   plug :scrub_params, "photo" when action in [:create, :update]
-  plug AuthPlug
+  plug AuthenticationPlug
   plug :translate_token_claims
 
   def create(conn, %{"user_id" => user_id, "photo" => photo}) do

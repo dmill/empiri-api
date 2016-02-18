@@ -31,7 +31,7 @@ defmodule EmpiriApi.Web do
       use Phoenix.Controller
 
       alias EmpiriApi.Repo
-      alias EmpiriApi.Plugs.AuthPlug
+      alias EmpiriApi.Plugs.AuthenticationPlug
       import EmpiriApi.Extensions.ControllerExtensions
       import Ecto
       import Ecto.Query, only: [from: 1, from: 2]

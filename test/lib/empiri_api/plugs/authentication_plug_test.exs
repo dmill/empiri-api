@@ -1,8 +1,8 @@
-defmodule EmpiriApi.Plugs.AuthPlugTest do
+defmodule EmpiriApi.Plugs.AuthenticationPlugTest do
 
   use ExUnit.Case, async: true
 
-  setup do {:ok, return_value: EmpiriApi.Plugs.AuthPlug.validate_auth_token} end
+  setup do {:ok, return_value: EmpiriApi.Plugs.AuthenticationPlug.validate_auth_token} end
 
   test "returns a Joken.Token struct using the Poison JSON module", %{return_value: return_value} do
     assert return_value.json_module == Poison

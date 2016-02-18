@@ -1,7 +1,7 @@
 defmodule EmpiriApi.StatusController do
   use EmpiriApi.Web, :controller
 
-  plug AuthPlug
+  plug AuthenticationPlug
 
   def index(conn, _params) do
     json conn, %{status: "available"}

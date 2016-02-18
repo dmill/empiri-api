@@ -4,7 +4,7 @@ defmodule EmpiriApi.UserController do
   alias EmpiriApi.User
 
   plug :scrub_params, "user" when action in [:create, :update]
-  plug AuthPlug
+  plug AuthenticationPlug
   plug :translate_token_claims
 
   def show(conn, _) do

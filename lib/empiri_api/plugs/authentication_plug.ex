@@ -1,4 +1,4 @@
-defmodule EmpiriApi.Plugs.AuthPlug do
+defmodule EmpiriApi.Plugs.AuthenticationPlug do
 
   def init(opts) do
     opts
