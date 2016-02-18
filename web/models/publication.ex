@@ -13,6 +13,7 @@ defmodule EmpiriApi.Publication do
     has_many  :user_publications, EmpiriApi.UserPublication
     has_many  :users, through: [:user_publications, :user]
     has_many  :authors, EmpiriApi.Author
+    has_many  :sections, EmpiriApi.Section
 
     timestamps
   end
