@@ -7,7 +7,7 @@ defmodule EmpiriApi.UserController do
   plug AuthenticationPlug
   plug :translate_token_claims
 
-  def show(conn, _) do
+  def login(conn, _) do
     user = Repo.get_or_insert_by(User, %{auth_id: conn.user[:auth_id], auth_provider: conn.user[:auth_provider]}, conn.user)
 
     case user do
@@ -18,6 +18,11 @@ defmodule EmpiriApi.UserController do
         |> put_status(:unprocessable_entity)
         |> render(EmpiriApi.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  def show(conn, %{"id" => id}) do
+    user = Repo.get!(User, id)
+    render(conn, "show.json", user: user)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do

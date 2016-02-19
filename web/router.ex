@@ -12,10 +12,9 @@ defmodule EmpiriApi.Router do
 
     get "/", StatusController, :index
 
-    #user show uses the auth token and therefore is not canonically RESTful
-    get "/users", UserController, :show
+    get "/users/login", UserController, :login
 
-    resources "/users", UserController, only: [:update] do
+    resources "/users", UserController, only: [:update, :show] do
       resources "photos", UserPhotosController, only: [:create]
     end
 

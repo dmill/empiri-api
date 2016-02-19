@@ -26,20 +26,20 @@ defmodule EmpiriApi.UserControllerTest do
     end
   end
 
-  defmodule ShowContext do
+  defmodule LoginContext do
     use SharedContext
 
-    @action "SHOW"
+    @action "LOGIN"
 
     setup do
       conn = conn() |> put_req_header("content-type", "application/json")
       {:ok, conn: conn}
     end
 
-    test "#{@action}: #{@context_desc[:existing_record]}, shows resource from db", %{conn: conn} do
+    test "#{@action}: #{@context_desc[:existing_record]}, logins resource from db", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
       user = Repo.insert! Map.merge(%User{},@valid_attrs)
-      conn = get conn, user_path(conn, :show)
+      conn = get conn, user_path(conn, :login)
       assert json_response(conn, 200)["user"] == %{"id" => user.id,
         "first_name" => user.first_name,
         "last_name" => user.last_name,
@@ -54,7 +54,7 @@ defmodule EmpiriApi.UserControllerTest do
       Repo.insert! Map.merge(%User{},@valid_attrs)
       count_fun = fn() -> Repo.all(from u in User, select: count(u.id)) |> List.first end
       user_count = count_fun.()
-      get conn, user_path(conn, :show)
+      get conn, user_path(conn, :login)
 
       assert count_fun.() == user_count
     end
@@ -63,14 +63,14 @@ defmodule EmpiriApi.UserControllerTest do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@invalid_params)}")
       count_fun = fn() -> Repo.all(from u in User, select: count(u.id)) |> List.first end
       user_count = count_fun.()
-      get conn, user_path(conn, :show)
+      get conn, user_path(conn, :login)
 
       assert count_fun.() == user_count
     end
 
     test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:invalid]}, returns an error", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@invalid_params)}")
-      conn = get conn, user_path(conn, :show)
+      conn = get conn, user_path(conn, :login)
       assert json_response(conn, 422)["errors"] != nil
     end
 
@@ -78,14 +78,14 @@ defmodule EmpiriApi.UserControllerTest do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
       count_fun = fn() -> Repo.all(from u in User, select: count(u.id)) |> List.first end
       user_count = count_fun.()
-      get conn, user_path(conn, :show)
+      get conn, user_path(conn, :login)
 
       assert count_fun.() == user_count + 1
     end
 
     test "#{@action}: #{@context_desc[:new_record]},#{@context_desc[:valid]}, returns user data", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
-      conn = get conn, user_path(conn, :show)
+      conn = get conn, user_path(conn, :login)
       assert json_response(conn, 200)["user"]["first_name"] == @valid_params[:given_name]
 
     end
