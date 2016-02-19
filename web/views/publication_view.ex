@@ -37,6 +37,8 @@ defmodule EmpiriApi.PublicationView do
       published: publication.published,
       first_author_id: publication.first_author_id,
       last_author_id: publication.last_author_id,
+      inserted_at: publication.inserted_at,
+      updated_at: publication.updated_at,
       admin_ids: admin_ids(publication)
     }
   end
