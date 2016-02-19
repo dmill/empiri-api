@@ -1,18 +1,17 @@
-defmodule EmpiriApi.Section do
+defmodule EmpiriApi.Figure do
   use EmpiriApi.Web, :model
 
-  schema "sections" do
-    field :title, :string
-    field :body, :string
+  schema "figures" do
+    field :caption, :string
     field :position, :integer
-    belongs_to :publication, EmpiriApi.Publication
-    has_many :figures, EmpiriApi.Figure
+    field :title, :string
+    belongs_to :section, EmpiriApi.Section
 
     timestamps
   end
 
-  @required_fields ~w(title position)
-  @optional_fields ~w(body)
+  @required_fields ~w(title)
+  @optional_fields ~w(caption position)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

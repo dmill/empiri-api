@@ -1,6 +1,9 @@
 defmodule EmpiriApi.SectionView do
   use EmpiriApi.Web, :view
 
+  alias EmpiriApi.FigureView
+  alias EmpiriApi.Repo
+
   def render("index.json", %{sections: sections}) do
     %{sections: render_many(sections, EmpiriApi.SectionView, "section.json")}
   end
@@ -10,10 +13,13 @@ defmodule EmpiriApi.SectionView do
   end
 
   def render("section.json", %{section: section}) do
-    %{id: section.id,
+    %{
+      id: section.id,
       title: section.title,
       body: section.body,
       position: section.position,
-      publication_id: section.publication_id}
+      publication_id: section.publication_id,
+      figures: FigureView.render("index.json", %{figures: (section |> Repo.preload([:figures])).figures})
+    }
   end
 end
