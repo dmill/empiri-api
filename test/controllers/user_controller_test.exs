@@ -7,6 +7,7 @@ defmodule EmpiriApi.UserControllerTest do
       quote do
         use EmpiriApi.ConnCase
         alias EmpiriApi.User
+        alias EmpiriApi.Publication
 
         @context_desc %{existing_record: "specified record exists",
                         new_record: "specified record doesn't exist",
@@ -36,17 +37,18 @@ defmodule EmpiriApi.UserControllerTest do
       {:ok, conn: conn}
     end
 
-    test "#{@action}: #{@context_desc[:existing_record]}, logins resource from db", %{conn: conn} do
+    test "#{@action}: #{@context_desc[:existing_record]}, shows resource from db", %{conn: conn} do
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
       user = Repo.insert! Map.merge(%User{},@valid_attrs)
+      published_pub = Map.merge(%Publication{}, %{title: "title", published: true}) |> Repo.insert!
+      unpublished_pub = Map.merge(%Publication{}, %{title: "titulo", published: false}) |> Repo.insert!
+
+      Ecto.build_assoc(user, :user_publications, publication_id: published_pub.id) |> Repo.insert!
+      Ecto.build_assoc(user, :user_publications, publication_id: unpublished_pub.id) |> Repo.insert!
+
       conn = get conn, user_path(conn, :login)
-      assert json_response(conn, 200)["user"] == %{"id" => user.id,
-        "first_name" => user.first_name,
-        "last_name" => user.last_name,
-        "title" => user.title,
-        "email" => user.email,
-        "organization" => user.organization,
-        "photo_url" => nil}
+      assert json_response(conn, 200)["user"]["first_name"] == user.first_name
+      assert json_response(conn, 200)["user"]["_embedded"]["publications"] |> Enum.count == 2
     end
 
     test "#{@action}: #{@context_desc[:existing_record]}, does not insert into db", %{conn: conn} do
@@ -88,6 +90,38 @@ defmodule EmpiriApi.UserControllerTest do
       conn = get conn, user_path(conn, :login)
       assert json_response(conn, 200)["user"]["first_name"] == @valid_params[:given_name]
 
+    end
+  end
+
+
+defmodule ShowContext do
+    use SharedContext
+
+    @action "SHOW"
+
+    setup do
+      conn = conn() |> put_req_header("content-type", "application/json")
+      {:ok, conn: conn}
+    end
+
+    test "#{@action}: resource exists, shows resource from db", %{conn: conn} do
+      user = Repo.insert! Map.merge(%User{},@valid_attrs)
+      published_pub = Map.merge(%Publication{}, %{title: "title", published: true}) |> Repo.insert!
+      unpublished_pub = Map.merge(%Publication{}, %{title: "titulo", published: false}) |> Repo.insert!
+
+      Ecto.build_assoc(user, :user_publications, publication_id: published_pub.id) |> Repo.insert!
+      Ecto.build_assoc(user, :user_publications, publication_id: unpublished_pub.id) |> Repo.insert!
+
+      conn = get conn, user_path(conn, :show, user.id)
+      assert json_response(conn, 200)["user"]["first_name"] == user.first_name
+      assert json_response(conn, 200)["user"]["_embedded"]["publications"] |> Enum.count == 1
+      assert json_response(conn, 200)["user"]["_embedded"]["publications"] |> List.first |> Map.get("title") == "title"
+    end
+
+    test "#{@action}: resource does not exist, returns 404", %{conn: conn} do
+      assert_raise Ecto.NoResultsError, fn ->
+        conn = get conn, user_path(conn, :show, 60)
+      end
     end
   end
 

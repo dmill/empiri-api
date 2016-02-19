@@ -3,16 +3,16 @@ defmodule EmpiriApi.UserController do
 
   alias EmpiriApi.User
 
-  plug :scrub_params, "user" when action in [:create, :update]
-  plug AuthenticationPlug
-  plug :translate_token_claims
+  plug :scrub_params, "user" when action in [:update]
+  plug AuthenticationPlug when action in [:login, :update]
+  plug :translate_token_claims when action in [:login, :update]
 
   def login(conn, _) do
     user = Repo.get_or_insert_by(User, %{auth_id: conn.user[:auth_id], auth_provider: conn.user[:auth_provider]}, conn.user)
 
     case user do
       {:ok, valid_user} ->
-        render(conn, "show.json", user: valid_user)
+        render(conn, "show.json", user: valid_user, publications: (valid_user |> Repo.preload([:publications])).publications)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -21,8 +21,9 @@ defmodule EmpiriApi.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
-    render(conn, "show.json", user: user)
+    user = Repo.get!(User, id) |> Repo.preload([:publications])
+    publications = user.publications |> Enum.filter(fn(pub) -> pub.published end)
+    render(conn, "show.json", user: user, publications: publications)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do

@@ -9,6 +9,10 @@ defmodule EmpiriApi.PublicationView do
     %{publications: render_many(publications, EmpiriApi.PublicationView, "abbreviated_publication.json")}
   end
 
+  def render("basic_index.json", %{publications: publications}) do
+    %{publications: render_many(publications, EmpiriApi.PublicationView, "base_publication.json")}
+  end
+
   def render("show.json", %{publication: publication}) do
     %{publication: render_one(publication, EmpiriApi.PublicationView, "publication.json")}
   end
@@ -19,6 +23,10 @@ defmodule EmpiriApi.PublicationView do
 
   def render("abbreviated_publication.json", %{publication: publication}) do
     base_publication(publication) |> Map.merge(render_abbrev_embedded(publication))
+  end
+
+  def render("base_publication.json", %{publication: publication}) do
+    base_publication(publication)
   end
 
   defp base_publication(publication) do
