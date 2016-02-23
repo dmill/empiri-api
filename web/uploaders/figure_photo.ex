@@ -27,7 +27,7 @@ defmodule EmpiriApi.FigurePhoto do
 
   # Override the storage directory:
   def storage_dir(version, {file, scope}) do
-    "/users/figures/#{scope.id}"
+    "/figures/#{scope.id}"
   end
 
   # Provide a default URL if there hasn't been a file uploaded

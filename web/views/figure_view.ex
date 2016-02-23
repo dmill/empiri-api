@@ -10,10 +10,13 @@ defmodule EmpiriApi.FigureView do
   end
 
   def render("figure.json", %{figure: figure}) do
-    %{id: figure.id,
+    %{
+      id: figure.id,
       caption: figure.caption,
       position: figure.position,
       title: figure.title,
-      section_id: figure.section_id}
+      section_id: figure.section_id,
+      photo_url: EmpiriApi.Figure.photo_url(figure)
+    }
   end
 end
