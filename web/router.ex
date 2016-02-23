@@ -30,6 +30,8 @@ defmodule EmpiriApi.Router do
           resources "photos", FigurePhotosController, only: [:create]
         end
       end
+
+      resources "/references", ReferenceController, only: [:create, :update, :delete]
     end
   end
 end
