@@ -19,6 +19,8 @@ defmodule EmpiriApi.User do
     has_many :user_publications, EmpiriApi.UserPublication
     has_many :publications, through: [:user_publications, :publication]
 
+    has_many :reviews, EmpiriApi.Review
+
     timestamps
   end
 

@@ -32,6 +32,8 @@ defmodule EmpiriApi.Router do
       end
 
       resources "/references", ReferenceController, only: [:create, :update, :delete]
+
+      resources "/reviews", ReviewController, only: [:create, :update, :delete, :index]
     end
   end
 end

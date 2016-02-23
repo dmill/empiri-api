@@ -12,7 +12,8 @@ defmodule EmpiriApi.UserController do
 
     case user do
       {:ok, valid_user} ->
-        render(conn, "show.json", user: valid_user, publications: (valid_user |> Repo.preload([:publications])).publications)
+        valid_user = valid_user |> Repo.preload([:publications, :reviews])
+        render(conn, "show.json", user: valid_user, publications: valid_user.publications)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -21,7 +22,7 @@ defmodule EmpiriApi.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Repo.get!(User, id) |> Repo.preload([:publications])
+    user = Repo.get!(User, id) |> Repo.preload([:publications, :reviews])
     publications = user.publications |> Enum.filter(fn(pub) -> pub.published end)
     render(conn, "show.json", user: user, publications: publications)
   end

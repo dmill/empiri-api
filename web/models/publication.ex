@@ -15,6 +15,7 @@ defmodule EmpiriApi.Publication do
     has_many  :authors, EmpiriApi.Author
     has_many  :sections, EmpiriApi.Section
     has_many  :references, EmpiriApi.Reference
+    has_many  :reviews, EmpiriApi.Review
 
     timestamps
   end

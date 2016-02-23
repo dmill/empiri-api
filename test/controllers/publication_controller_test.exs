@@ -139,6 +139,9 @@ defmodule SharedContext do
                                               organization: "petco",
                                               email: "pug@petco.com") |> Repo.insert!
 
+      Ecto.build_assoc(publication, :references, title: "title",
+                                                 link: "https://link.com",
+                                                 authors: "Buster,Andrew,Doug") |> Repo.insert!
 
       conn = conn |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
       conn = get conn, publication_path(conn, :show, publication.id)
@@ -148,9 +151,11 @@ defmodule SharedContext do
       assert json_response(conn, 200)["publication"]["first_author_id"]
       assert json_response(conn, 200)["publication"]["last_author_id"]
       assert json_response(conn, 200)["publication"]["_embedded"]["authors"] |> List.first |> Map.get("first_name") == "Buster"
-      assert json_response(conn, 200)["publication"]["_embedded"]["users"] |>
-             Enum.map(fn(u) -> u["id"] end) |>
-             Enum.member?(user.id)
+      assert json_response(conn, 200)["publication"]["_embedded"]["users"]
+              |> Enum.map(fn(u) -> u["id"] end)
+              |> Enum.member?(user.id)
+
+      assert json_response(conn, 200)["publication"]["_embedded"]["references"] |> List.first |> Map.get("title") == "title"
     end
   end
 

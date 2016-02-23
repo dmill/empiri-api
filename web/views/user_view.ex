@@ -2,6 +2,7 @@ defmodule EmpiriApi.UserView do
   use EmpiriApi.Web, :view
 
   alias EmpiriApi.PublicationView
+  alias EmpiriApi.ReviewView
 
   def render("index.json", %{users: users}) do
     %{users: render_many(users, EmpiriApi.UserView, "user.json")}
@@ -28,9 +29,10 @@ defmodule EmpiriApi.UserView do
     }
   end
 
-  defp render_embedded(%{user: _user, publications: publications}) do
+  defp render_embedded(%{user: user, publications: publications}) do
     %{
       _embedded: PublicationView.render("basic_index.json", %{publications: publications})
+                 |> Map.merge(ReviewView.render("user_index.json", %{reviews: user.reviews}))
     }
   end
 end
