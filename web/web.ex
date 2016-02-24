@@ -38,8 +38,6 @@ defmodule EmpiriApi.Web do
       import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
 
-      import Canary.Plugs
-
       import EmpiriApi.Router.Helpers
       require Logger
     end
