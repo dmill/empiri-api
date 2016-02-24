@@ -17,8 +17,8 @@ defmodule EmpiriApi.Extensions.ControllerExtensions do
   def translate_token_claims(conn, _ \\ nil) do
     joken_attrs = conn.assigns[:joken_claims]
     [auth_provider, auth_id] = String.split(joken_attrs["sub"], "|")
-    Map.merge(conn, %{user: %{auth_provider: auth_provider, auth_id: auth_id,
-                              email: joken_attrs["email"], first_name: joken_attrs["given_name"],
-                              last_name: joken_attrs["family_name"], external_photo_url: joken_attrs["picture"]}})
+    Map.merge(conn, %{user_attrs: %{auth_provider: auth_provider, auth_id: auth_id,
+                                    email: joken_attrs["email"], first_name: joken_attrs["given_name"],
+                                    last_name: joken_attrs["family_name"], external_photo_url: joken_attrs["picture"]}})
   end
 end

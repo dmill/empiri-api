@@ -20,7 +20,7 @@ defmodule EmpiriApi.PublicationController do
   end
 
   def create(conn, %{"publication" => publication_params}) do
-    user = Repo.get_by!(User, auth_provider: conn.user[:auth_provider], auth_id: conn.user[:auth_id])
+    user = Repo.get_by!(User, auth_provider: conn.user_attrs[:auth_provider], auth_id: conn.user_attrs[:auth_id])
     changeset = Publication.changeset(%Publication{}, publication_params)
 
     case Repo.insert(changeset) do
@@ -75,7 +75,7 @@ defmodule EmpiriApi.PublicationController do
     users_auth_creds = publication.users |> Enum.map(fn(user) ->
                                             %{auth_provider: user.auth_provider, auth_id: user.auth_id} end)
 
-    if Enum.member?(users_auth_creds, %{auth_provider: conn.user[:auth_provider], auth_id: conn.user[:auth_id]}) do
+    if Enum.member?(users_auth_creds, %{auth_provider: conn.user_attrs[:auth_provider], auth_id: conn.user_attrs[:auth_id]}) do
       perform_private_operation(conn.private[:phoenix_action], conn, publication, params)
     else
      render_unauthorized(conn)
@@ -112,8 +112,8 @@ defmodule EmpiriApi.PublicationController do
 
   defp check_admin_status(conn, publication) do
     Publication.admins(publication) |> Enum.find(fn(user) ->
-                                                user.auth_provider == conn.user[:auth_provider] &&
-                                                user.auth_id == conn.user[:auth_id]
+                                                user.auth_provider == conn.user_attrs[:auth_provider] &&
+                                                user.auth_id == conn.user_attrs[:auth_id]
                                                end)
   end
 end

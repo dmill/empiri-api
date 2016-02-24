@@ -12,7 +12,7 @@ defmodule EmpiriApi.UserPhotosController do
   end
 
   defp authorize_and_create(conn, user, photo) do
-    if user.auth_provider == conn.user[:auth_provider] && user.auth_id == conn.user[:auth_id] do
+    if user.auth_provider == conn.user_attrs[:auth_provider] && user.auth_id == conn.user_attrs[:auth_id] do
       upload_and_render(conn, user, photo)
     else
       render_unauthorized(conn)
