@@ -5,7 +5,7 @@ defmodule EmpiriApi.UserController do
 
   plug :scrub_params, "user" when action in [:update]
   plug AuthenticationPlug when action in [:login, :update]
-  plug :translate_token_claims when action in [:login, :update]
+  plug TranslateTokenClaimsPlug when action in [:login, :update]
 
   def login(conn, _) do
     user = Repo.get_or_insert_by(User, %{auth_id: conn.user_attrs[:auth_id], auth_provider: conn.user_attrs[:auth_provider]}, conn.user_attrs)

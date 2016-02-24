@@ -5,7 +5,7 @@ defmodule EmpiriApi.SectionController do
   alias EmpiriApi.Section
 
   plug AuthenticationPlug when action in [:create, :update, :delete]
-  plug :translate_token_claims when action in [:create]
+  plug TranslateTokenClaimsPlug when action in [:create]
   plug :scrub_params, "section" when action in [:create, :update]
 
   def create(conn, %{"publication_id" => publication_id, "section" => section_params}) do

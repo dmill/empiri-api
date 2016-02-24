@@ -44,6 +44,7 @@ defmodule EmpiriApi.Mixfile do
      {:ex_aws, "~> 0.4.10"},
      {:arc, "~> 0.2.0", git: "git@github.com:dmill/arc.git", override: true},
      {:arc_ecto, "~> 0.3.1"},
+     {:canary, "~> 0.14.0"},
      {:mock, "~> 0.1.1", only: :test}]
   end
 

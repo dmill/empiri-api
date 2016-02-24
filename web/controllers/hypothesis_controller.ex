@@ -5,7 +5,7 @@ defmodule EmpiriApi.HypothesisController do
   alias EmpiriApi.User
 
   plug AuthenticationPlug when action in [:create]
-  plug :translate_token_claims when action in [:create]
+  plug TranslateTokenClaimsPlug when action in [:create]
   plug :scrub_params, "hypothesis" when action in [:create, :update]
 
 

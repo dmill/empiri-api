@@ -5,7 +5,7 @@ defmodule EmpiriApi.PublicationController do
   alias EmpiriApi.User
 
   plug AuthenticationPlug when action in [:create, :update, :delete]
-  plug :translate_token_claims when action in [:create, :update, :delete]
+  plug TranslateTokenClaimsPlug when action in [:create, :update, :delete]
   plug :scrub_params, "publication" when action in [:create, :update]
 
   def index(conn, params) do

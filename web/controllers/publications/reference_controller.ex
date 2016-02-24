@@ -5,7 +5,7 @@ defmodule EmpiriApi.ReferenceController do
   alias EmpiriApi.Reference
 
   plug AuthenticationPlug when action in [:create, :update, :delete]
-  plug :translate_token_claims when action in [:create]
+  plug TranslateTokenClaimsPlug when action in [:create]
   plug :scrub_params, "reference" when action in [:create, :update]
 
   def create(conn, %{"publication_id" => publication_id, "reference" => reference_params}) do

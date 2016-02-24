@@ -5,7 +5,7 @@ defmodule EmpiriApi.AuthorController do
   alias EmpiriApi.Author
 
   plug AuthenticationPlug when action in [:create, :update, :delete]
-  plug :translate_token_claims when action in [:create]
+  plug TranslateTokenClaimsPlug when action in [:create]
   plug :scrub_params, "author" when action in [:create, :update]
 
 

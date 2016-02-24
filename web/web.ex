@@ -32,9 +32,13 @@ defmodule EmpiriApi.Web do
 
       alias EmpiriApi.Repo
       alias EmpiriApi.Plugs.AuthenticationPlug
+      alias EmpiriApi.Plugs.TranslateTokenClaimsPlug
+
       import EmpiriApi.Extensions.ControllerExtensions
       import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
+
+      import Canary.Plugs
 
       import EmpiriApi.Router.Helpers
       require Logger
