@@ -29,6 +29,6 @@ defmodule EmpiriApi.Plugs.CurrentUserPlugTest do
           |> Map.merge(%{user_attrs: %{ auth_provider: "google", auth_id: "1"}})
           |> CurrentUserPlug.call
 
-    assert conn.current_user == user
+    assert conn.assigns[:current_user] == user
   end
 end

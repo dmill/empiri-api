@@ -15,7 +15,12 @@ defmodule EmpiriApi.Plugs.CurrentUserPlug do
   defp get_user(conn) do
     user = Repo.get_by(User, auth_id: conn.user_attrs[:auth_id],
                           auth_provider: conn.user_attrs[:auth_provider])
-    if user, do: conn |> Map.merge(%{current_user: user}), else: fail(conn)
+    if user do
+      conn
+      |> Map.update!(:assigns, &(Map.merge(&1, %{current_user: user})))
+    else
+      fail(conn)
+    end
   end
 
   defp fail(conn), do: render_unauthorized(conn) |> halt
