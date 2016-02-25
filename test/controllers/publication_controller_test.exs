@@ -198,10 +198,9 @@ defmodule SharedContext do
     test "#{@action}: user not found", %{conn: conn} do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(%{auth_id: 619})}")
+                  |> post(publication_path(conn, :create), Poison.encode!(%{publication: @valid_attrs}))
 
-      assert_raise Ecto.NoResultsError, fn ->
-        post(conn, publication_path(conn, :create), Poison.encode!(%{publication: @valid_attrs}))
-      end
+      assert json_response(conn, 401)
     end
 
     test "#{@action}: creates and renders resource when data is valid", %{conn: conn, user: user} do
@@ -245,12 +244,15 @@ defmodule SharedContext do
       assert json_response(conn, 415)["error"] == "Unsupported Media Type"
     end
 
-    test "#{@action}: no publication param", %{conn: conn} do
+    test "#{@action}: no publication param", %{conn: conn, user: user} do
+      publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title"})
+      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true) |> Repo.insert
+
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
 
        assert_raise Phoenix.MissingParamError, fn ->
-        put(conn, publication_path(conn, :update, 33), Poison.encode!(%{junk: "garbage"}))
+        put(conn, publication_path(conn, :update, publication), Poison.encode!(%{junk: "garbage"}))
       end
     end
 
@@ -297,10 +299,9 @@ defmodule SharedContext do
 
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
 
-      assert_raise Ecto.NoResultsError, fn ->
-        put(conn, publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
-      end
+      assert json_response(conn, 404)
     end
 
     test "#{@action}: publication not found", %{conn: conn} do
@@ -380,10 +381,9 @@ defmodule SharedContext do
 
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+                  |> delete(publication_path(conn, :delete, publication))
 
-      assert_raise Ecto.NoResultsError, fn ->
-        delete(conn, publication_path(conn, :delete, publication))
-      end
+      assert json_response(conn, 404)
     end
 
     test "#{@action}: soft-deletes the record when user is an admin", %{conn: conn, user: user} do

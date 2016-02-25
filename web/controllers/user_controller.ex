@@ -5,10 +5,10 @@ defmodule EmpiriApi.UserController do
 
   plug :scrub_params, "user" when action in [:update]
   plug AuthenticationPlug when action in [:login, :update]
-  plug :translate_token_claims when action in [:login, :update]
+  plug TranslateTokenClaimsPlug when action in [:login, :update]
 
   def login(conn, _) do
-    user = Repo.get_or_insert_by(User, %{auth_id: conn.user[:auth_id], auth_provider: conn.user[:auth_provider]}, conn.user)
+    user = Repo.get_or_insert_by(User, %{auth_id: conn.user_attrs[:auth_id], auth_provider: conn.user_attrs[:auth_provider]}, conn.user_attrs)
 
     case user do
       {:ok, valid_user} ->
@@ -33,7 +33,7 @@ defmodule EmpiriApi.UserController do
   end
 
   defp authorize_and_update(conn, user, user_params) do
-    if user.auth_provider == conn.user[:auth_provider] && user.auth_id == conn.user[:auth_id] do
+    if user.auth_provider == conn.user_attrs[:auth_provider] && user.auth_id == conn.user_attrs[:auth_id] do
       update_and_render(conn, user, user_params)
     else
       render_unauthorized(conn)

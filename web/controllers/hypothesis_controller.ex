@@ -5,7 +5,7 @@ defmodule EmpiriApi.HypothesisController do
   alias EmpiriApi.User
 
   plug AuthenticationPlug when action in [:create]
-  plug :translate_token_claims when action in [:create]
+  plug TranslateTokenClaimsPlug when action in [:create]
   plug :scrub_params, "hypothesis" when action in [:create, :update]
 
 
@@ -20,7 +20,7 @@ defmodule EmpiriApi.HypothesisController do
   end
 
   def create(conn, %{"hypothesis" => hypothesis_params}) do
-    user = Repo.get_by!(User, auth_provider: conn.user[:auth_provider], auth_id: conn.user[:auth_id])
+    user = Repo.get_by!(User, auth_provider: conn.user_attrs[:auth_provider], auth_id: conn.user_attrs[:auth_id])
     changeset = Hypothesis.changeset(%Hypothesis{}, hypothesis_params)
 
     case Repo.insert(changeset) do
@@ -64,7 +64,7 @@ defmodule EmpiriApi.HypothesisController do
     if conn.halted do
       conn
     else
-      conn |> translate_token_claims |> find_user_auth(hypothesis, params)
+      conn |> TranslateTokenClaimsPlug.call |> find_user_auth(hypothesis, params)
     end
   end
 
@@ -72,7 +72,7 @@ defmodule EmpiriApi.HypothesisController do
     users_auth_creds = hypothesis.users |> Enum.map(fn(user) ->
                                             %{auth_provider: user.auth_provider, auth_id: user.auth_id} end)
 
-    if Enum.member?(users_auth_creds, %{auth_provider: conn.user[:auth_provider], auth_id: conn.user[:auth_id]}) do
+    if Enum.member?(users_auth_creds, %{auth_provider: conn.user_attrs[:auth_provider], auth_id: conn.user_attrs[:auth_id]}) do
       perform_private_operation(conn.private[:phoenix_action], conn, hypothesis, params)
     else
      render_unauthorized(conn)
@@ -109,8 +109,8 @@ defmodule EmpiriApi.HypothesisController do
 
   defp check_admin_status(conn, hypothesis) do
     Hypothesis.admins(hypothesis) |> Enum.find(fn(user) ->
-                                                user.auth_provider == conn.user[:auth_provider] &&
-                                                user.auth_id == conn.user[:auth_id]
+                                                user.auth_provider == conn.user_attrs[:auth_provider] &&
+                                                user.auth_id == conn.user_attrs[:auth_id]
                                                end)
   end
 end
