@@ -104,7 +104,7 @@ defmodule ShowContext do
       {:ok, conn: conn}
     end
 
-    test "#{@action}: resource exists, shows resource from db", %{conn: conn} do
+    test "#{@action}: for anonymous user - resource exists, shows resource from db and only shows published publications", %{conn: conn} do
       user = Repo.insert! Map.merge(%User{},@valid_attrs)
       published_pub = Map.merge(%Publication{}, %{title: "title", published: true}) |> Repo.insert!
       unpublished_pub = Map.merge(%Publication{}, %{title: "titulo", published: false}) |> Repo.insert!
@@ -113,6 +113,41 @@ defmodule ShowContext do
       Ecto.build_assoc(user, :user_publications, publication_id: unpublished_pub.id) |> Repo.insert!
 
       conn = get conn, user_path(conn, :show, user.id)
+      assert json_response(conn, 200)["user"]["first_name"] == user.first_name
+      assert json_response(conn, 200)["user"]["_embedded"]["publications"] |> Enum.count == 1
+      assert json_response(conn, 200)["user"]["_embedded"]["publications"] |> List.first |> Map.get("title") == "title"
+    end
+
+
+    test "#{@action}: for logged-in user - resource exists, shows resource from db and all publications", %{conn: conn} do
+      user = Repo.insert! Map.merge(%User{},@valid_attrs)
+      published_pub = Map.merge(%Publication{}, %{title: "title", published: true}) |> Repo.insert!
+      unpublished_pub = Map.merge(%Publication{}, %{title: "titulo", published: false}) |> Repo.insert!
+
+      Ecto.build_assoc(user, :user_publications, publication_id: published_pub.id) |> Repo.insert!
+      Ecto.build_assoc(user, :user_publications, publication_id: unpublished_pub.id) |> Repo.insert!
+
+      conn = conn
+              |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
+              |> get(user_path(conn, :show, user.id))
+
+      assert json_response(conn, 200)["user"]["first_name"] == user.first_name
+      assert json_response(conn, 200)["user"]["_embedded"]["publications"] |> Enum.count == 2
+      assert json_response(conn, 200)["user"]["_embedded"]["publications"] |> List.first |> Map.get("title") == "title"
+    end
+
+    test "#{@action}: for wrong logged-in user - resource exists, shows resource from db but restricts unpublished", %{conn: conn} do
+      user = Repo.insert! Map.merge(%User{},@valid_attrs)
+      published_pub = Map.merge(%Publication{}, %{title: "title", published: true}) |> Repo.insert!
+      unpublished_pub = Map.merge(%Publication{}, %{title: "titulo", published: false}) |> Repo.insert!
+
+      Ecto.build_assoc(user, :user_publications, publication_id: published_pub.id) |> Repo.insert!
+      Ecto.build_assoc(user, :user_publications, publication_id: unpublished_pub.id) |> Repo.insert!
+
+      conn = conn
+              |> put_req_header("authorization", "Bearer #{generate_auth_token(%{auth_provider: "junk", auth_id: "35"})}")
+              |> get(user_path(conn, :show, user.id))
+
       assert json_response(conn, 200)["user"]["first_name"] == user.first_name
       assert json_response(conn, 200)["user"]["_embedded"]["publications"] |> Enum.count == 1
       assert json_response(conn, 200)["user"]["_embedded"]["publications"] |> List.first |> Map.get("title") == "title"
