@@ -46,7 +46,7 @@ defmodule EmpiriApi.PublicationController do
   def show(conn, %{"id" => id}) do
     publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors, :sections, :references])
     if !publication.published do
-      authorize_user(conn, publication)
+      authorize_unpublished_show(conn, publication)
     else
       render(conn, "show.json", publication: publication)
     end
@@ -82,18 +82,14 @@ defmodule EmpiriApi.PublicationController do
     end
   end
 ###################### Private ################################
-  defp authorize_user(conn, publication, params \\ nil) do
+  defp authorize_unpublished_show(conn, publication, params \\ nil) do
     conn = AuthenticationPlug.call(conn)
 
     if conn.halted do
       conn
     else
-      conn |> translate_token_claims |> find_user_auth(publication, params)
+      conn |> TranslateTokenClaimsPlug.call |> find_user_auth(publication, params)
     end
-  end
-
-  defp new_authorize_user(conn, publication, params \\ nil) do
-    conn |> find_user_auth(publication, params)
   end
 
   defp find_user_auth(conn, publication, params) do
@@ -101,44 +97,9 @@ defmodule EmpiriApi.PublicationController do
                                             %{auth_provider: user.auth_provider, auth_id: user.auth_id} end)
 
     if Enum.member?(users_auth_creds, %{auth_provider: conn.user_attrs[:auth_provider], auth_id: conn.user_attrs[:auth_id]}) do
-      perform_private_operation(conn.private[:phoenix_action], conn, publication, params)
+      render(conn, "show.json", publication: publication)
     else
      render_unauthorized(conn)
     end
-  end
-
-  defp perform_private_operation(:show, conn, publication, _), do: render(conn, "show.json", publication: publication)
-
-  defp perform_private_operation(:update, conn, publication, params) do
-    if check_admin_status(conn, publication) do
-      changeset = Publication.changeset(publication, params)
-
-      case Repo.update(changeset) do
-        {:ok, publication} ->
-          render(conn, "show.json", publication: publication)
-        {:error, changeset} ->
-          conn
-          |> put_status(:unprocessable_entity)
-          |> render(EmpiriApi.ChangesetView, "error.json", changeset: changeset)
-      end
-    else
-      render_unauthorized(conn)
-    end
-  end
-
-  defp perform_private_operation(:delete, conn, publication, _) do
-    if check_admin_status(conn, publication) do
-      Publication.changeset(publication, %{deleted: true}) |> Repo.update!
-      send_resp(conn, :no_content, "")
-    else
-      render_unauthorized(conn)
-    end
-  end
-
-  defp check_admin_status(conn, publication) do
-    Publication.admins(publication) |> Enum.find(fn(user) ->
-                                                user.auth_provider == conn.user_attrs[:auth_provider] &&
-                                                user.auth_id == conn.user_attrs[:auth_id]
-                                               end)
   end
 end

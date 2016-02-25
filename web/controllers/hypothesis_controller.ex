@@ -64,7 +64,7 @@ defmodule EmpiriApi.HypothesisController do
     if conn.halted do
       conn
     else
-      conn |> translate_token_claims |> find_user_auth(hypothesis, params)
+      conn |> TranslateTokenClaimsPlug.call |> find_user_auth(hypothesis, params)
     end
   end
 
