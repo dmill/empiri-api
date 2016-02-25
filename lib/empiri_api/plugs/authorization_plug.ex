@@ -12,7 +12,7 @@ defmodule EmpiriApi.Plugs.AuthorizationPlug do
   end
 
   defp load_and_authorize_resource(conn, resource_type, opts) do
-    resource = Repo.get!(resource_type, conn.params["id"])
+    resource = Repo.get!(resource_type, conn.params[opts[:param] || "id"])
     if opts[:ownership_on_associated] do
       conn |> authorize_associated_resource(resource, resource_type, opts)
     else

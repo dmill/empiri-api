@@ -9,6 +9,7 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
   alias EmpiriApi.Review
   alias EmpiriApi.Publication
   alias EmpiriApi.UserPublication
+  alias EmpiriApi.Section
 
   setup do
     user = User.changeset(%User{}, %{email: "slug@gmail.com",
@@ -22,15 +23,21 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
 
     publication = Publication.changeset(%Publication{}, %{title: "title"}) |> Repo.insert!
     user_pub = Ecto.build_assoc(publication, :user_publications, %{user_id: user.id})|> Repo.insert!
+    section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 0}) |> Repo.insert!
 
     on_exit fn ->
+      Repo.delete!(section)
       Repo.delete!(review)
       Repo.delete!(user_pub)
       Repo.delete!(publication)
       Repo.delete!(user)
     end
 
-    {:ok, user: user, review: review, publication: publication, user_pub: user_pub}
+    {:ok, user: user,
+          review: review,
+          publication: publication,
+          user_pub: user_pub,
+          section: section}
   end
 
   test "conn has no current_user", %{user: _user, review: review} do
@@ -102,7 +109,13 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
     assert conn.resource == publication
   end
 
-  test "nested resource" do
+  test "nested resource", %{user: user, publication: publication, user_pub: user_pub, section: section} do
+    conn = conn()
+            |> Map.put(:params, %{"id" => section.id, "publication_id" => publication.id})
+            |> Map.merge(%{assigns: %{current_user: user}})
+            |> AuthorizationPlug.call(Publication, ownership_on_associated: UserPublication,
+                                                   param: "publication_id")
 
+    assert conn.resource == publication
   end
 end
