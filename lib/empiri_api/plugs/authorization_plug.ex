@@ -7,8 +7,8 @@ defmodule EmpiriApi.Plugs.AuthorizationPlug do
     opts
   end
 
-  def call(conn, resource_type, opts \\ %{}) do
-    load_and_authorize_resource(conn, resource_type, opts)
+  def call(conn, opts \\ %{}) do
+    load_and_authorize_resource(conn, opts[:resource_type], opts)
   end
 
   defp load_and_authorize_resource(conn, resource_type, opts) do

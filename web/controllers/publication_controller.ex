@@ -2,10 +2,15 @@ defmodule EmpiriApi.PublicationController do
   use EmpiriApi.Web, :controller
 
   alias EmpiriApi.Publication
+  alias EmpiriApi.UserPublication
   alias EmpiriApi.User
 
   plug AuthenticationPlug when action in [:create, :update, :delete]
   plug TranslateTokenClaimsPlug when action in [:create, :update, :delete]
+  plug CurrentUserPlug when action in [:create, :update, :delete]
+  plug AuthorizationPlug, %{resource_type: Publication,
+                            ownership_on_associated: UserPublication,
+                            admin: true} when action in [:update, :delete]
   plug :scrub_params, "publication" when action in [:create, :update]
 
   def index(conn, params) do
@@ -20,7 +25,7 @@ defmodule EmpiriApi.PublicationController do
   end
 
   def create(conn, %{"publication" => publication_params}) do
-    user = Repo.get_by!(User, auth_provider: conn.user_attrs[:auth_provider], auth_id: conn.user_attrs[:auth_id])
+    user = conn.assigns[:current_user]
     changeset = Publication.changeset(%Publication{}, publication_params)
 
     case Repo.insert(changeset) do
@@ -48,13 +53,33 @@ defmodule EmpiriApi.PublicationController do
   end
 
   def update(conn, %{"id" => id, "publication" => publication_params}) do
-    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors, :sections, :references])
-    new_authorize_user(conn, publication, publication_params)
+    publication = conn.resource |> Repo.preload([:users, :authors, :sections, :references])
+
+    if publication.deleted do
+      render_not_found(conn)
+    else
+      changeset = Publication.changeset(publication, publication_params)
+
+      case Repo.update(changeset) do
+        {:ok, publication} ->
+          render(conn, "show.json", publication: publication)
+        {:error, changeset} ->
+          conn
+          |> put_status(:unprocessable_entity)
+          |> render(EmpiriApi.ChangesetView, "error.json", changeset: changeset)
+      end
+    end
   end
 
   def delete(conn, %{"id" => id}) do
-    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors, :sections, :references])
-    new_authorize_user(conn, publication)
+    publication = conn.resource |> Repo.preload([:users, :authors, :sections, :references])
+
+    if publication.deleted do
+      render_not_found(conn)
+    else
+      Publication.changeset(publication, %{deleted: true}) |> Repo.update!
+      send_resp(conn, :no_content, "")
+    end
   end
 ###################### Private ################################
   defp authorize_user(conn, publication, params \\ nil) do

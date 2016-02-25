@@ -32,7 +32,9 @@ defmodule EmpiriApi.Web do
 
       alias EmpiriApi.Repo
       alias EmpiriApi.Plugs.AuthenticationPlug
+      alias EmpiriApi.Plugs.AuthorizationPlug
       alias EmpiriApi.Plugs.TranslateTokenClaimsPlug
+      alias EmpiriApi.Plugs.CurrentUserPlug
 
       import EmpiriApi.Extensions.ControllerExtensions
       import Ecto

@@ -43,7 +43,7 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
   test "conn has no current_user", %{user: _user, review: review} do
     conn = conn()
             |> Map.put(:params, %{"id" => review.id})
-            |> AuthorizationPlug.call(Review)
+            |> AuthorizationPlug.call(resource_type: Review)
 
     assert conn.state == :sent
     assert conn.status == 401
@@ -54,7 +54,7 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
       conn()
         |> Map.put(:params, %{"id" => 1})
         |> Map.merge(%{assigns: %{current_user: %User{id: 1}}})
-        |> AuthorizationPlug.call(Review)
+        |> AuthorizationPlug.call(resource_type: Review)
     end
   end
 
@@ -62,7 +62,7 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
     conn = conn()
             |> Map.put(:params, %{"id" => review.id})
             |> Map.merge(%{assigns: %{current_user: %User{id: 5}}})
-            |> AuthorizationPlug.call(Review)
+            |> AuthorizationPlug.call(resource_type: Review)
 
     assert conn.state == :sent
     assert conn.status == 401
@@ -72,7 +72,7 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
     conn = conn()
             |> Map.put(:params, %{"id" => review.id})
             |> Map.merge(%{assigns: %{current_user: user}})
-            |> AuthorizationPlug.call(Review)
+            |> AuthorizationPlug.call(resource_type: Review)
 
     assert conn.resource == review
   end
@@ -81,7 +81,8 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
     conn = conn()
             |> Map.put(:params, %{"id" => publication.id})
             |> Map.merge(%{assigns: %{current_user: user}})
-            |> AuthorizationPlug.call(Publication, ownership_on_associated: EmpiriApi.UserPublication)
+            |> AuthorizationPlug.call(resource_type: Publication,
+                                      ownership_on_associated: EmpiriApi.UserPublication)
 
     assert conn.resource == publication
   end
@@ -90,8 +91,9 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
     conn = conn()
             |> Map.put(:params, %{"id" => publication.id})
             |> Map.merge(%{assigns: %{current_user: user}})
-            |> AuthorizationPlug.call(Publication, ownership_on_associated: EmpiriApi.UserPublication,
-                                                   admin: true)
+            |> AuthorizationPlug.call(resource_type: Publication,
+                                      ownership_on_associated: EmpiriApi.UserPublication,
+                                      admin: true)
 
     assert conn.state == :sent
     assert conn.status == 401
@@ -103,8 +105,9 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
     conn = conn()
             |> Map.put(:params, %{"id" => publication.id})
             |> Map.merge(%{assigns: %{current_user: user}})
-            |> AuthorizationPlug.call(Publication, ownership_on_associated: UserPublication,
-                                                   admin: true)
+            |> AuthorizationPlug.call(resource_type: Publication,
+                                      ownership_on_associated: UserPublication,
+                                      admin: true)
 
     assert conn.resource == publication
   end
@@ -113,8 +116,9 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
     conn = conn()
             |> Map.put(:params, %{"id" => section.id, "publication_id" => publication.id})
             |> Map.merge(%{assigns: %{current_user: user}})
-            |> AuthorizationPlug.call(Publication, ownership_on_associated: UserPublication,
-                                                   param: "publication_id")
+            |> AuthorizationPlug.call(resource_type: Publication,
+                                      ownership_on_associated: UserPublication,
+                                      param: "publication_id")
 
     assert conn.resource == publication
   end
