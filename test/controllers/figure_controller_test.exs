@@ -13,7 +13,7 @@ defmodule EmpiriApi.FigureControllerTest do
 
         @valid_attrs %{title: "Ciencia", caption: "science", position: 4}
 
-        @invalid_attrs %{title: nil}
+        @invalid_attrs %{position: "string"}
 
         @user_attrs %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
                        organization: "Harvard", title: "President",
@@ -42,7 +42,8 @@ defmodule EmpiriApi.FigureControllerTest do
                     |> Repo.insert!
       section = Ecto.build_assoc(publication, :sections, %{position: 0})
                   |> Repo.insert!
-
+      user_pub = Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
+                 |> Repo.insert!
       {:ok, conn: conn, user: user, publication: publication, section: section}
     end
 
@@ -60,12 +61,12 @@ defmodule EmpiriApi.FigureControllerTest do
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
 
-    test "#{@action}: no figure param", %{conn: conn} do
+    test "#{@action}: no figure param", %{conn: conn, publication: publication} do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
 
        assert_raise Phoenix.MissingParamError, fn ->
-        post(conn, "/publications/1/sections/2/figures", Poison.encode!(%{junk: "garbage"}))
+        post(conn, "/publications/#{publication.id}/sections/2/figures", Poison.encode!(%{junk: "garbage"}))
       end
     end
 

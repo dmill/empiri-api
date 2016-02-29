@@ -11,7 +11,7 @@ defmodule EmpiriApi.ReferenceController do
   plug AuthorizationPlug, %{resource_type: Publication,
                             ownership_on_associated: UserPublication,
                             admin: true,
-                            param: "publication_id"} when action in [:update, :delete]
+                            param: "publication_id"} when action in [:create, :update, :delete]
   plug :scrub_params, "reference" when action in [:create, :update]
 
   def create(conn, %{"publication_id" => publication_id, "reference" => reference_params}) do

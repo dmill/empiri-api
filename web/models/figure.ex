@@ -13,8 +13,8 @@ defmodule EmpiriApi.Figure do
     timestamps
   end
 
-  @required_fields ~w(title)
-  @optional_fields ~w(caption position)
+  @required_fields ~w()
+  @optional_fields ~w(title caption position)
 
   @required_file_fields ~w()
   @optional_file_fields ~w(photo)

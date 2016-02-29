@@ -37,7 +37,7 @@ defmodule EmpiriApi.ReviewController do
     end
   end
 
-  def update(conn, %{"publication_id" => publication_id, "id" => id, "review" => review_params}) do
+  def update(conn, %{"publication_id" => _publication_id, "id" => id, "review" => review_params}) do
     review = Repo.get!(Review, id)
     changeset = Review.changeset(review, review_params)
 

@@ -4,7 +4,7 @@ defmodule EmpiriApi.FigureTest do
   alias EmpiriApi.Figure
 
   @valid_attrs %{caption: "some content", position: 42, title: "blah"}
-  @invalid_attrs %{}
+  @invalid_attrs %{position: "string"}
 
   test "changeset with valid attributes" do
     changeset = Figure.changeset(%Figure{}, @valid_attrs)

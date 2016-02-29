@@ -40,6 +40,9 @@ defmodule EmpiriApi.ReferenceControllerTest do
       publication = Publication.changeset(%Publication{}, %{title: "some content", last_reference_id: 1, first_reference_id: 2})
                     |> Repo.insert!
 
+      user_pub = Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
+                 |> Repo.insert!
+
       {:ok, conn: conn, user: user, publication: publication}
     end
 
@@ -57,12 +60,12 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
 
-    test "#{@action}: no reference param", %{conn: conn} do
+    test "#{@action}: no reference param", %{conn: conn, publication: publication} do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
 
        assert_raise Phoenix.MissingParamError, fn ->
-        post(conn, "/publications/1/references", Poison.encode!(%{junk: "garbage"}))
+        post(conn, "/publications/#{publication.id}/references", Poison.encode!(%{junk: "garbage"}))
       end
     end
 

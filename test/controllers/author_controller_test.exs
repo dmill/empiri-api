@@ -42,6 +42,9 @@ defmodule EmpiriApi.AuthorControllerTest do
       publication = Publication.changeset(%Publication{}, %{title: "some content", last_author_id: 1, first_author_id: 2})
                     |> Repo.insert!
 
+      user_pub = Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
+                 |> Repo.insert!
+
       {:ok, conn: conn, user: user, publication: publication}
     end
 
@@ -59,12 +62,12 @@ defmodule EmpiriApi.AuthorControllerTest do
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
 
-    test "#{@action}: no author param", %{conn: conn} do
+    test "#{@action}: no author param", %{conn: conn, publication: publication} do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
 
        assert_raise Phoenix.MissingParamError, fn ->
-        post(conn, "/publications/1/authors", Poison.encode!(%{junk: "garbage"}))
+        post(conn, "/publications/#{publication.id}/authors", Poison.encode!(%{junk: "garbage"}))
       end
     end
 

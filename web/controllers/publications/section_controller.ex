@@ -11,7 +11,7 @@ defmodule EmpiriApi.SectionController do
   plug AuthorizationPlug, %{resource_type: Publication,
                             ownership_on_associated: UserPublication,
                             admin: true,
-                            param: "publication_id"} when action in [:update, :delete]
+                            param: "publication_id"} when action in [:create, :update, :delete]
   plug :scrub_params, "section" when action in [:create, :update]
 
   def create(conn, %{"publication_id" => publication_id, "section" => section_params}) do
@@ -30,7 +30,7 @@ defmodule EmpiriApi.SectionController do
     end
   end
 
-  def update(conn, %{"publication_id" => publication_id, "id" => id, "section" => section_params}) do
+  def update(conn, %{"publication_id" => _publication_id, "id" => id, "section" => section_params}) do
     section = Repo.get!(Section, id)
     changeset = Section.changeset(section, section_params)
 
@@ -44,7 +44,7 @@ defmodule EmpiriApi.SectionController do
     end
   end
 
-  def delete(conn, %{"publication_id" => publication_id, "id" => id}) do
+  def delete(conn, %{"publication_id" => _publication_id, "id" => id}) do
     section = Repo.get!(Section, id)
 
     # Here we use delete! (with a bang) because we expect

@@ -12,7 +12,7 @@ defmodule EmpiriApi.FigureController do
   plug AuthorizationPlug, %{resource_type: Publication,
                             ownership_on_associated: UserPublication,
                             admin: true,
-                            param: "publication_id"} when action in [:update, :delete]
+                            param: "publication_id"} when action in [:create, :update, :delete]
 
   plug :scrub_params, "figure" when action in [:create, :update]
 
@@ -32,7 +32,7 @@ defmodule EmpiriApi.FigureController do
     end
   end
 
-  def update(conn, %{"publication_id" => _publication_id, "section_id" => section_id, "id" => id, "figure" => figure_params}) do
+  def update(conn, %{"publication_id" => _publication_id, "section_id" => _section_id, "id" => id, "figure" => figure_params}) do
     figure = Repo.get!(Figure, id)
     changeset = Figure.changeset(figure, figure_params)
 
