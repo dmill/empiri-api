@@ -1,5 +1,5 @@
 defmodule EmpiriApi.AuthorControllerTest do
-defmodule SharedContext do
+  defmodule SharedContext do
     use ExUnit.CaseTemplate
 
     using do
