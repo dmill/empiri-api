@@ -6,6 +6,11 @@ defmodule EmpiriApi.SectionController do
 
   plug AuthenticationPlug when action in [:create, :update, :delete]
   plug TranslateTokenClaimsPlug when action in [:create]
+  plug CurrentUserPlug when action in [:create, :update, :delete]
+  plug AuthorizationPlug, %{resource_type: Publication,
+                            ownership_on_associated: UserPublication,
+                            admin: true,
+                            param: "publication_id"} when action in [:update, :delete]
   plug :scrub_params, "section" when action in [:create, :update]
 
   def create(conn, %{"publication_id" => publication_id, "section" => section_params}) do
