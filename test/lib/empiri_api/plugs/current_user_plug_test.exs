@@ -30,5 +30,6 @@ defmodule EmpiriApi.Plugs.CurrentUserPlugTest do
           |> CurrentUserPlug.call
 
     assert conn.assigns[:current_user] == user
+    Repo.delete!(user)
   end
 end
