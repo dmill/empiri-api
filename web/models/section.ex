@@ -11,8 +11,8 @@ defmodule EmpiriApi.Section do
     timestamps
   end
 
-  @required_fields ~w(title position)
-  @optional_fields ~w(body)
+  @required_fields ~w(position)
+  @optional_fields ~w(title body)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
