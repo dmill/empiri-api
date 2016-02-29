@@ -92,9 +92,9 @@ defmodule SharedContext do
                   |> post("/publications/#{publication.id}/sections", Poison.encode!(%{section: @valid_attrs}))
 
       assert json_response(conn, 201)["section"]["title"] == "some content"
-      assert (Repo.all(from p in Publication,
+      assert (Repo.all(from s in Section,
                       limit: 1,
-                      order_by: [desc: p.id])
+                      order_by: [desc: s.id])
              |> List.first).title == "some content"
 
     end
@@ -183,7 +183,7 @@ defmodule SharedContext do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "#{@action}: publication not found", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: section not found", %{conn: conn, user: user, publication: publication} do
       section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 1}) |> Repo.insert!
       conn = conn |> put_req_header("content-type", "application/json")
             |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
@@ -234,7 +234,7 @@ defmodule SharedContext do
     test "#{@action}: no auth header", %{conn: conn, user: user, publication: publication} do
       section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       conn = conn |> put_req_header("content-type", "application/json")
-                  |> delete("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @valid_attrs}))
+                  |> delete("/publications/#{publication.id}/sections/#{section.id}")
 
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
@@ -243,7 +243,7 @@ defmodule SharedContext do
       section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(auth_id: 678)}")
-                  |> delete("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @valid_attrs}))
+                  |> delete("/publications/#{publication.id}/sections/#{section.id}")
 
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
@@ -254,7 +254,7 @@ defmodule SharedContext do
 
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  |> delete("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @valid_attrs}))
+                  |> delete("/publications/#{publication.id}/sections/#{section.id}")
 
 
       assert json_response(conn, 401)["error"] == "Unauthorized"
@@ -264,7 +264,7 @@ defmodule SharedContext do
       section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 1}) |> Repo.insert!
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  |> delete("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @valid_attrs}))
+                  |> delete("/publications/#{publication.id}/sections/#{section.id}")
 
       assert response(conn, 204)
       assert Repo.get(Section, section.id) == nil
