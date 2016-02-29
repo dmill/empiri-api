@@ -42,7 +42,7 @@ defmodule EmpiriApi.FigureControllerTest do
                     |> Repo.insert!
       section = Ecto.build_assoc(publication, :sections, %{position: 0})
                   |> Repo.insert!
-      user_pub = Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
+      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
                  |> Repo.insert!
       {:ok, conn: conn, user: user, publication: publication, section: section}
     end

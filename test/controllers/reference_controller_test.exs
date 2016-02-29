@@ -40,7 +40,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       publication = Publication.changeset(%Publication{}, %{title: "some content", last_reference_id: 1, first_reference_id: 2})
                     |> Repo.insert!
 
-      user_pub = Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
+      _user_pub = Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
                  |> Repo.insert!
 
       {:ok, conn: conn, user: user, publication: publication}

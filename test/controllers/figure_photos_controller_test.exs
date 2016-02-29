@@ -66,9 +66,9 @@ defmodule EmpiriApi.FigurePhotosControllerTest do
       assert json_response(connection, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: resource found, user is unauthorized", %{conn: conn, user: user, publication: publication, user_pub: user_pub, section: section} do
+    test "#{@action}: resource found, user is unauthorized", %{conn: conn, publication: publication, section: section} do
       attrs = @valid_attrs |> Map.merge(%{auth_id: "55789", auth_provider: "linkedin"})
-      user2 = User.changeset(%User{}, attrs) |> Repo.insert!
+      User.changeset(%User{}, attrs) |> Repo.insert!
       connection = conn
                     |> put_req_header("content-type", "multipart/form-data")
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(attrs)}")
@@ -77,7 +77,7 @@ defmodule EmpiriApi.FigurePhotosControllerTest do
       assert json_response(connection, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: resource found, photo is invalid", %{conn: conn, user: user, publication: publication, section: section} do
+    test "#{@action}: resource found, photo is invalid", %{conn: conn, user: _user, publication: publication, section: section} do
       connection = conn
                     |> put_req_header("content-type", "multipart/form-data")
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
@@ -86,7 +86,7 @@ defmodule EmpiriApi.FigurePhotosControllerTest do
       assert json_response(connection, 422)["error"] != %{}
     end
 
-    test "#{@action}: resource found, photo is valid, error uploading to S3", %{conn: conn, user: user, publication: publication, section: section} do
+    test "#{@action}: resource found, photo is valid, error uploading to S3", %{conn: conn, user: _user, publication: publication, section: section} do
       with_mock EmpiriApi.FigurePhoto, [store: fn(_args) -> {:error, ["unauthorized"]} end] do
       {:ok, photo_path} = Plug.Upload.random_file("testing")
       photo = File.read(photo_path)
@@ -100,7 +100,7 @@ defmodule EmpiriApi.FigurePhotosControllerTest do
       end
     end
 
-    test "#{@action}: resource found, photo is valid, success uploading to S3", %{conn: conn, user: user, publication: publication, section: section} do
+    test "#{@action}: resource found, photo is valid, success uploading to S3", %{conn: conn, user: _user, publication: publication, section: section} do
       with_mock EmpiriApi.FigurePhoto, [:passthrough], [store: fn(_args) -> {:ok, "filename.png"} end] do
         {:ok, photo_path} = Plug.Upload.random_file("testing")
 

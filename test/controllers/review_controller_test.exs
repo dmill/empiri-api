@@ -189,7 +189,7 @@ defmodule EmpiriApi.ReviewControllerTest do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: user does not own review", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: user does not own review", %{conn: conn, user: _user, publication: publication} do
       user2 = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
                                         organization: "Harvard", title: "President",
                                         auth_id: "54321", auth_provider: "linkedin"}) |> Repo.insert!
@@ -272,7 +272,7 @@ defmodule EmpiriApi.ReviewControllerTest do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: user does not own review", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: user does not own review", %{conn: conn, user: _user, publication: publication} do
       user2 = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
                                         organization: "Harvard", title: "President",
                                         auth_id: "54321", auth_provider: "linkedin"}) |> Repo.insert!
