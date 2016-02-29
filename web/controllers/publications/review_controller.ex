@@ -3,6 +3,15 @@ defmodule EmpiriApi.ReviewController do
 
   alias EmpiriApi.Review
   alias EmpiriApi.Publication
+  alias EmpiriApi.UserPublication
+
+  plug AuthenticationPlug when action in [:create, :update, :delete]
+  plug TranslateTokenClaimsPlug when action in [:create, :update, :delete]
+  plug CurrentUserPlug when action in [:create, :update, :delete]
+  plug AuthorizationPlug, %{resource_type: Publication,
+                            ownership_on_associated: UserPublication,
+                            admin: true,
+                            param: "publication_id"} when action in [:update, :delete]
 
   plug :scrub_params, "review" when action in [:create, :update]
 
@@ -12,8 +21,9 @@ defmodule EmpiriApi.ReviewController do
   end
 
   def create(conn, %{"publication_id" => publication_id, "review" => review_params}) do
+    attrs = review_params |> Map.put("user_id", conn.assigns[:current_user].id)
     publication = Repo.get!(Publication, publication_id)
-    changeset = Ecto.build_assoc(publication, :reviews) |> Review.changeset(review_params)
+    changeset = Ecto.build_assoc(publication, :reviews) |> Review.changeset(attrs)
 
     case Repo.insert(changeset) do
       {:ok, review} ->
