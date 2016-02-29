@@ -39,7 +39,7 @@ defmodule EmpiriApi.AuthorController do
     end
   end
 
-  def delete(conn, %{"publication_id" => publication_id, "id" => id, "author" => author_params}) do
+  def delete(conn, %{"publication_id" => publication_id, "id" => id}) do
     author = Repo.get!(Author, id)
     Repo.delete!(author)
     send_resp(conn, :no_content, "")
