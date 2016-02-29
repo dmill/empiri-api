@@ -3,6 +3,16 @@ defmodule EmpiriApi.FigureController do
 
   alias EmpiriApi.Figure
   alias EmpiriApi.Section
+  alias EmpiriApi.Publication
+  alias EmpiriApi.UserPublication
+
+  plug AuthenticationPlug when action in [:create, :update, :delete]
+  plug TranslateTokenClaimsPlug when action in [:create, :update, :delete]
+  plug CurrentUserPlug when action in [:create, :update, :delete]
+  plug AuthorizationPlug, %{resource_type: Publication,
+                            ownership_on_associated: UserPublication,
+                            admin: true,
+                            param: "publication_id"} when action in [:update, :delete]
 
   plug :scrub_params, "figure" when action in [:create, :update]
 
