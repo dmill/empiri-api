@@ -8,10 +8,7 @@ defmodule EmpiriApi.ReviewController do
   plug AuthenticationPlug when action in [:create, :update, :delete]
   plug TranslateTokenClaimsPlug when action in [:create, :update, :delete]
   plug CurrentUserPlug when action in [:create, :update, :delete]
-  plug AuthorizationPlug, %{resource_type: Publication,
-                            ownership_on_associated: UserPublication,
-                            admin: true,
-                            param: "publication_id"} when action in [:update, :delete]
+  plug AuthorizationPlug, %{resource_type: Review} when action in [:update, :delete]
 
   plug :scrub_params, "review" when action in [:create, :update]
 

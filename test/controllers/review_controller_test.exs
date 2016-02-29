@@ -152,10 +152,7 @@ defmodule EmpiriApi.ReviewControllerTest do
       publication = Publication.changeset(%Publication{}, %{title: "some content", last_author_id: 1, first_author_id: 2})
                     |> Repo.insert!
 
-      user_pub = Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
-                 |> Repo.insert!
-
-      {:ok, conn: conn, user: user, publication: publication, user_pub: user_pub}
+      {:ok, conn: conn, user: user, publication: publication}
     end
 
     test "#{@action}: wrong content-type header", %{conn: conn} do
@@ -192,14 +189,15 @@ defmodule EmpiriApi.ReviewControllerTest do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: user is not an admin", %{conn: conn, user: user, publication: publication, user_pub: user_pub} do
-      review = Repo.insert! Review.changeset(%Review{}, @valid_attrs |> Map.put(:user_id, user.id))
-      UserPublication.changeset(user_pub, %{admin: false}) |> Repo.update
+    test "#{@action}: user does not own review", %{conn: conn, user: user, publication: publication} do
+      user2 = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                        organization: "Harvard", title: "President",
+                                        auth_id: "54321", auth_provider: "linkedin"}) |> Repo.insert!
 
+      review = Repo.insert! Review.changeset(%Review{}, @valid_attrs |> Map.put(:user_id, user2.id))
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  |> put("/publications/#{publication.id}/reviews/#{review.id}", Poison.encode!(%{review: @valid_attrs}))
-
+                  |> put("/publications/#{publication.id}/reviews/#{review.id}", Poison.encode!(%{review: %{title: "another title"}}))
 
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
@@ -247,10 +245,7 @@ defmodule EmpiriApi.ReviewControllerTest do
       publication = Publication.changeset(%Publication{}, %{title: "some content", last_author_id: 1, first_author_id: 2})
                     |> Repo.insert!
 
-      user_pub = Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
-                 |> Repo.insert!
-
-      {:ok, conn: conn, user: user, publication: publication, user_pub: user_pub}
+      {:ok, conn: conn, user: user, publication: publication}
     end
 
     test "#{@action}: wrong content-type header", %{conn: conn} do
@@ -277,14 +272,15 @@ defmodule EmpiriApi.ReviewControllerTest do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: user is not an admin", %{conn: conn, user: user, publication: publication, user_pub: user_pub} do
-      review = Repo.insert! Review.changeset(%Review{}, @valid_attrs |> Map.put(:user_id, user.id))
-      UserPublication.changeset(user_pub, %{admin: false}) |> Repo.update
+    test "#{@action}: user does not own review", %{conn: conn, user: user, publication: publication} do
+      user2 = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                        organization: "Harvard", title: "President",
+                                        auth_id: "54321", auth_provider: "linkedin"}) |> Repo.insert!
 
+      review = Repo.insert! Review.changeset(%Review{}, @valid_attrs |> Map.put(:user_id, user2.id))
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
                   |> delete("/publications/#{publication.id}/reviews/#{review.id}")
-
 
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
