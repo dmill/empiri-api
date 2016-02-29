@@ -28,7 +28,8 @@ defmodule EmpiriApi.Router do
         resources "photos", FigurePhotosController, only: [:create]
 
         resources "figures", FigureController, only: [:create, :update, :delete] do
-          resources "photos", FigurePhotosController, only: [:update]
+          put "photos", FigurePhotosController, :update
+          patch "photos", FigurePhotosController, :update
         end
       end
 

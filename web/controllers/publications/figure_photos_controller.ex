@@ -20,6 +20,18 @@ defmodule EmpiriApi.FigurePhotosController do
     figure = Ecto.build_assoc(section, :figures, %{}) |> Repo.insert!
     changeset = Figure.changeset(figure, %{photo: photo})
 
+    update_figure(conn, changeset, figure)
+  end
+
+  #Need to delete old objects if they are being updated!
+  def update(conn, %{"figure_id" => figure_id, "photo" => photo}) do
+    figure = Repo.get!(Figure, figure_id)
+    changeset = Figure.changeset(figure, %{photo: photo})
+
+    update_figure(conn, changeset, figure)
+  end
+
+  defp update_figure(conn, changeset, figure) do
     case Repo.update(changeset) do
       {:ok, figure} ->
         json conn, %{url: EmpiriApi.Figure.photo_url(figure)}
@@ -30,9 +42,5 @@ defmodule EmpiriApi.FigurePhotosController do
         |> put_status(:unprocessable_entity)
         |> render(EmpiriApi.ChangesetView, "error.json", changeset: changeset)
     end
-  end
-
-  def update(conn, %{"figure_id" => figure_id, "photo" => photo}) do
-
   end
 end
