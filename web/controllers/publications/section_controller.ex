@@ -2,10 +2,11 @@ defmodule EmpiriApi.SectionController do
   use EmpiriApi.Web, :controller
 
   alias EmpiriApi.Publication
+  alias EmpiriApi.UserPublication
   alias EmpiriApi.Section
 
   plug AuthenticationPlug when action in [:create, :update, :delete]
-  plug TranslateTokenClaimsPlug when action in [:create]
+  plug TranslateTokenClaimsPlug when action in [:create, :update, :delete]
   plug CurrentUserPlug when action in [:create, :update, :delete]
   plug AuthorizationPlug, %{resource_type: Publication,
                             ownership_on_associated: UserPublication,

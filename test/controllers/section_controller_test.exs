@@ -7,10 +7,12 @@ defmodule SharedContext do
         use EmpiriApi.ConnCase
         alias EmpiriApi.User
         alias EmpiriApi.Publication
+        alias EmpiriApi.Section
+        alias EmpiriApi.UserPublication
 
         @valid_attrs %{title: "some content", body: "blah", position: 2}
 
-        @invalid_attrs %{title: nil}
+        @invalid_attrs %{position: nil}
 
         @user_attrs %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
                        organization: "Harvard", title: "President",
@@ -55,7 +57,7 @@ defmodule SharedContext do
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
 
-    test "#{@action}: no publication param", %{conn: conn} do
+    test "#{@action}: no section param", %{conn: conn} do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
 
@@ -116,95 +118,89 @@ defmodule SharedContext do
       user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
                                 organization: "Harvard", title: "President",
                                 auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
-      {:ok, conn: conn, user: user}
+
+      publication = Publication.changeset(%Publication{}, %{title: "some content", last_author_id: 1, first_author_id: 2})
+                    |> Repo.insert!
+
+      user_pub = Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true)
+                 |> Repo.insert!
+
+      {:ok, conn: conn, user: user, publication: publication, user_pub: user_pub}
     end
 
     test "#{@action}: wrong content-type header", %{conn: conn} do
       conn = conn |> put_req_header("content-type", "application/xml")
-                  |> put(publication_path(conn, :update, 33))
+                  |> put("/publications/1/sections/1")
 
       assert json_response(conn, 415)["error"] == "Unsupported Media Type"
     end
 
-    test "#{@action}: no publication param", %{conn: conn, user: user} do
-      publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title"})
-      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true) |> Repo.insert
-
-      conn = conn |> put_req_header("content-type", "application/json")
-                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+    test "#{@action}: no section param", %{conn: conn, user: user, publication: publication} do
+      section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
 
        assert_raise Phoenix.MissingParamError, fn ->
-        put(conn, publication_path(conn, :update, publication), Poison.encode!(%{junk: "garbage"}))
+        conn |> put_req_header("content-type", "application/json")
+             |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+             |> put("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{junk: "garbage"}))
       end
     end
 
-    test "#{@action}: no auth header", %{conn: conn} do
-      publication = Repo.insert! %Publication{}
+    test "#{@action}: no auth header", %{conn: conn, user: user, publication: publication} do
+      section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       conn = conn |> put_req_header("content-type", "application/json")
-                  |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
+                  |> put("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @valid_attrs}))
 
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
 
-    test "#{@action}: user not found", %{conn: conn} do
-      publication = Repo.insert! %Publication{}
+    test "#{@action}: user not found", %{conn: conn, user: user, publication: publication} do
+      section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       conn = conn |> put_req_header("content-type", "application/json")
-                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
+                  |> put_req_header("authorization", "Bearer #{generate_auth_token(auth_id: 678)}")
+                  |> put("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @valid_attrs}))
 
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: user is not an admin", %{conn: conn, user: user} do
-      publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title"})
-      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: false) |> Repo.insert
+    test "#{@action}: user is not an admin", %{conn: conn, user: user, publication: publication, user_pub: user_pub} do
+      section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
+      UserPublication.changeset(user_pub, %{admin: false}) |> Repo.update
 
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
+                  |> put("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @valid_attrs}))
 
 
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: does not update resource and renders errors when data is invalid", %{conn: conn} do
+    test "#{@action}: does not update resource and renders errors when data is invalid", %{conn: conn, user: user, publication: publication} do
+      section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 1}) |> Repo.insert!
       conn = conn |> put_req_header("content-type", "application/json")
             |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-            |> post(publication_path(conn, :create), Poison.encode!(%{publication: @invalid_attrs}))
+            |> put("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @invalid_attrs}))
 
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "#{@action}: publication is deleted", %{conn: conn, user: user} do
-      publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title", deleted: true})
-      Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true) |> Repo.insert
-
+    test "#{@action}: publication not found", %{conn: conn, user: user, publication: publication} do
+      section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 1}) |> Repo.insert!
       conn = conn |> put_req_header("content-type", "application/json")
-                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                  |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
-
-      assert json_response(conn, 404)
-    end
-
-    test "#{@action}: publication not found", %{conn: conn} do
-      conn = conn |> put_req_header("content-type", "application/json")
-                  |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
+            |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
 
       assert_raise Ecto.NoResultsError, fn ->
-        put(conn, publication_path(conn, :update, 32), Poison.encode!(%{publication: @valid_attrs}))
+        put(conn, "/publications/#{publication.id}/sections/12345", Poison.encode!(%{section: @valid_attrs}))
       end
     end
 
-      test "#{@action}: updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: user} do
-        publication = Repo.insert! Publication.changeset(%Publication{}, %{title: "title"})
-        Ecto.build_assoc(publication, :user_publications, user_id: user.id, admin: true) |> Repo.insert
-
+      test "#{@action}: updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: user, publication: publication} do
+        section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 1}) |> Repo.insert!
         conn = conn |> put_req_header("content-type", "application/json")
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
-                    |> put(publication_path(conn, :update, publication), Poison.encode!(%{publication: @valid_attrs}))
+                    |> put("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @valid_attrs}))
 
-        assert json_response(conn, 200)["publication"]["id"]
-        assert Repo.get_by(Publication, @valid_attrs)
+        assert json_response(conn, 200)["section"]["id"]
+        assert Repo.get_by(Section, @valid_attrs)
       end
   end
 
