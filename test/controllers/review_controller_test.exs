@@ -26,6 +26,36 @@ defmodule EmpiriApi.ReviewControllerTest do
     end
   end
 
+  defmodule IndexContext do
+    use SharedContext
+
+    @action "INDEX"
+
+    setup do
+      pub = Repo.insert! %Publication{title: "thing", deleted: false, published: true}
+
+      Enum.each(1..8, fn(x) ->
+          user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                organization: "Harvard", title: "President",
+                                auth_id: Integer.to_string(x), auth_provider: "petco"}) |> Repo.insert!
+        Ecto.build_assoc(pub, :reviews, %{title: "hi", body: "body", rating: 1, user_id: user.id})
+          |> Repo.insert!
+      end)
+
+      conn = conn() |> put_req_header("accept", "application/json")
+      {:ok, conn: conn, publication: pub}
+    end
+
+    test "#{@action}: returns all reviews for a publication", %{conn: conn, publication: publication} do
+      conn = get conn, "/publications/#{publication.id}/reviews"
+
+      resp = Poison.decode!(response(conn, 200))
+
+      assert json_response(conn, 200)["reviews"]
+      assert Enum.count(resp["reviews"]) == 8
+    end
+  end
+
   defmodule CreateContext do
     use SharedContext
 
