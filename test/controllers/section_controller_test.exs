@@ -75,7 +75,7 @@ defmodule SharedContext do
       assert json_response(conn, 401)
     end
 
-    test "#{@action}: publication not found", %{conn: conn, user: user} do
+    test "#{@action}: publication not found", %{conn: conn, user: _user} do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
 
@@ -86,7 +86,7 @@ defmodule SharedContext do
       end
     end
 
-    test "#{@action}: creates and renders resource when data is valid", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: creates and renders resource when data is valid", %{conn: conn, user: _user, publication: publication} do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
                   |> post("/publications/#{publication.id}/sections", Poison.encode!(%{section: @valid_attrs}))
@@ -99,7 +99,7 @@ defmodule SharedContext do
 
     end
 
-    test "#{@action}: does not create resource and renders errors when data is invalid", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: does not create resource and renders errors when data is invalid", %{conn: conn, user: _user, publication: publication} do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
                   |> post("/publications/#{publication.id}/sections", Poison.encode!(%{section: @invalid_attrs}))
@@ -135,7 +135,7 @@ defmodule SharedContext do
       assert json_response(conn, 415)["error"] == "Unsupported Media Type"
     end
 
-    test "#{@action}: no section param", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: no section param", %{conn: conn, user: _user, publication: publication} do
       section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
 
        assert_raise Phoenix.MissingParamError, fn ->
@@ -145,7 +145,7 @@ defmodule SharedContext do
       end
     end
 
-    test "#{@action}: no auth header", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: no auth header", %{conn: conn, user: _user, publication: publication} do
       section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put("/publications/#{publication.id}/sections/#{section.id}", Poison.encode!(%{section: @valid_attrs}))
@@ -153,7 +153,7 @@ defmodule SharedContext do
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
 
-    test "#{@action}: user not found", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: user not found", %{conn: conn, user: _user, publication: publication} do
       section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(auth_id: 678)}")
@@ -162,7 +162,7 @@ defmodule SharedContext do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: user is not an admin", %{conn: conn, user: user, publication: publication, user_pub: user_pub} do
+    test "#{@action}: user is not an admin", %{conn: conn, user: _user, publication: publication, user_pub: user_pub} do
       section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       UserPublication.changeset(user_pub, %{admin: false}) |> Repo.update
 
@@ -174,7 +174,7 @@ defmodule SharedContext do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: does not update resource and renders errors when data is invalid", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: does not update resource and renders errors when data is invalid", %{conn: conn, user: _user, publication: publication} do
       section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 1}) |> Repo.insert!
       conn = conn |> put_req_header("content-type", "application/json")
             |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
@@ -183,8 +183,7 @@ defmodule SharedContext do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "#{@action}: section not found", %{conn: conn, user: user, publication: publication} do
-      section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 1}) |> Repo.insert!
+    test "#{@action}: section not found", %{conn: conn, user: _user, publication: publication} do
       conn = conn |> put_req_header("content-type", "application/json")
             |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
 
@@ -193,7 +192,7 @@ defmodule SharedContext do
       end
     end
 
-      test "#{@action}: updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: user, publication: publication} do
+      test "#{@action}: updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: _user, publication: publication} do
         section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 1}) |> Repo.insert!
         conn = conn |> put_req_header("content-type", "application/json")
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
@@ -231,7 +230,7 @@ defmodule SharedContext do
       assert json_response(conn, 415)["error"] == "Unsupported Media Type"
     end
 
-    test "#{@action}: no auth header", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: no auth header", %{conn: conn, user: _user, publication: publication} do
       section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       conn = conn |> put_req_header("content-type", "application/json")
                   |> delete("/publications/#{publication.id}/sections/#{section.id}")
@@ -239,7 +238,7 @@ defmodule SharedContext do
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
 
-    test "#{@action}: user not found", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: user not found", %{conn: conn, user: _user, publication: publication} do
       section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(auth_id: 678)}")
@@ -248,7 +247,7 @@ defmodule SharedContext do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: user is not an admin", %{conn: conn, user: user, publication: publication, user_pub: user_pub} do
+    test "#{@action}: user is not an admin", %{conn: conn, user: _user, publication: publication, user_pub: user_pub} do
       section = Repo.insert! Section.changeset(%Section{}, %{title: "title", position: 0})
       UserPublication.changeset(user_pub, %{admin: false}) |> Repo.update
 
@@ -260,7 +259,7 @@ defmodule SharedContext do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: deletes the record when user is an admin", %{conn: conn, user: user, publication: publication, user_pub: user_pub} do
+    test "#{@action}: deletes the record when user is an admin", %{conn: conn, user: _user, publication: publication} do
       section = Ecto.build_assoc(publication, :sections, %{title: "title", position: 1}) |> Repo.insert!
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")

@@ -135,7 +135,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 415)["error"] == "Unsupported Media Type"
     end
 
-    test "#{@action}: no reference param", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: no reference param", %{conn: conn, user: _user, publication: publication} do
       reference = Repo.insert! Reference.changeset(%Reference{}, @valid_attrs)
 
        assert_raise Phoenix.MissingParamError, fn ->
@@ -145,7 +145,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       end
     end
 
-    test "#{@action}: no auth header", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: no auth header", %{conn: conn, user: _user, publication: publication} do
       reference = Repo.insert! Reference.changeset(%Reference{}, @valid_attrs)
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put("/publications/#{publication.id}/references/#{reference.id}", Poison.encode!(%{reference: @valid_attrs}))
@@ -153,7 +153,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
 
-    test "#{@action}: user not found", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: user not found", %{conn: conn, user: _user, publication: publication} do
       reference = Repo.insert! Reference.changeset(%Reference{}, @valid_attrs)
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(auth_id: 678)}")
@@ -162,7 +162,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: user is not an admin", %{conn: conn, user: user, publication: publication, user_pub: user_pub} do
+    test "#{@action}: user is not an admin", %{conn: conn, user: _user, publication: publication, user_pub: user_pub} do
       reference = Repo.insert! Reference.changeset(%Reference{}, @valid_attrs)
       UserPublication.changeset(user_pub, %{admin: false}) |> Repo.update
 
@@ -174,7 +174,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: does not update resource and renders errors when data is invalid", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: does not update resource and renders errors when data is invalid", %{conn: conn, user: _user, publication: publication} do
       reference = Ecto.build_assoc(publication, :references, @valid_attrs) |> Repo.insert!
       conn = conn |> put_req_header("content-type", "application/json")
             |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
@@ -183,8 +183,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "#{@action}: reference not found", %{conn: conn, user: user, publication: publication} do
-      reference = Ecto.build_assoc(publication, :references, @valid_attrs) |> Repo.insert!
+    test "#{@action}: reference not found", %{conn: conn, user: _user, publication: publication} do
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
 
@@ -193,7 +192,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       end
     end
 
-      test "#{@action}: updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: user, publication: publication} do
+      test "#{@action}: updates and renders chosen resource when data is valid and user is an admin", %{conn: conn, user: _user, publication: publication} do
         reference = Ecto.build_assoc(publication, :references, @valid_attrs) |> Repo.insert!
         conn = conn |> put_req_header("content-type", "application/json")
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")
@@ -231,7 +230,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 415)["error"] == "Unsupported Media Type"
     end
 
-    test "#{@action}: no auth header", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: no auth header", %{conn: conn, user: _user, publication: publication} do
       reference = Repo.insert! Reference.changeset(%Reference{}, @valid_attrs)
       conn = conn |> put_req_header("content-type", "application/json")
                   |> delete("/publications/#{publication.id}/references/#{reference.id}")
@@ -239,7 +238,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 401)["error"] == "unauthorized"
     end
 
-    test "#{@action}: user not found", %{conn: conn, user: user, publication: publication} do
+    test "#{@action}: user not found", %{conn: conn, user: _user, publication: publication} do
       reference = Repo.insert! Reference.changeset(%Reference{}, @valid_attrs)
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(auth_id: 678)}")
@@ -248,7 +247,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: user is not an admin", %{conn: conn, user: user, publication: publication, user_pub: user_pub} do
+    test "#{@action}: user is not an admin", %{conn: conn, user: _user, publication: publication, user_pub: user_pub} do
       reference = Repo.insert! Reference.changeset(%Reference{}, @valid_attrs)
       UserPublication.changeset(user_pub, %{admin: false}) |> Repo.update
 
@@ -260,7 +259,7 @@ defmodule EmpiriApi.ReferenceControllerTest do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: deletes the record when user is an admin", %{conn: conn, user: user, publication: publication, user_pub: user_pub} do
+    test "#{@action}: deletes the record when user is an admin", %{conn: conn, user: _user, publication: publication, user_pub: _user_pub} do
       reference = Ecto.build_assoc(publication, :references, @valid_attrs) |> Repo.insert!
       conn = conn |> put_req_header("content-type", "application/json")
                   |> put_req_header("authorization", "Bearer #{generate_auth_token(@user_params)}")

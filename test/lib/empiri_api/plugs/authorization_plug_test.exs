@@ -9,7 +9,6 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
   alias EmpiriApi.Review
   alias EmpiriApi.Publication
   alias EmpiriApi.UserPublication
-  alias EmpiriApi.Section
 
   setup do
     user = User.changeset(%User{}, %{email: "slug@gmail.com",
@@ -112,7 +111,7 @@ defmodule EmpiriApi.Plugs.AuthorizationPlugTest do
     assert conn.resource == publication
   end
 
-  test "nested resource", %{user: user, publication: publication, user_pub: user_pub, section: section} do
+  test "nested resource", %{user: user, publication: publication, section: section} do
     conn = conn()
             |> Map.put(:params, %{"id" => section.id, "publication_id" => publication.id})
             |> Map.merge(%{assigns: %{current_user: user}})

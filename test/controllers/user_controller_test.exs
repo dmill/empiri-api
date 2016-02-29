@@ -155,7 +155,7 @@ defmodule ShowContext do
 
     test "#{@action}: resource does not exist, returns 404", %{conn: conn} do
       assert_raise Ecto.NoResultsError, fn ->
-        conn = get conn, user_path(conn, :show, 60)
+        get conn, user_path(conn, :show, 60)
       end
     end
   end
@@ -178,7 +178,7 @@ defmodule ShowContext do
       assert json_response(conn, 404)["error"] == "Not Found"
     end
 
-    test "#{@action}: resource found, user is unauthorized", %{conn: conn, valid_attrs: valid_attrs} do
+    test "#{@action}: resource found, user is unauthorized", %{conn: conn} do
       second_user_attrs = %{email: "guy@gmail.com", first_name: "Pug", last_name: "Jeremy",
                             organization: "Harvard", title: "President",
                             auth_id: "1234567", auth_provider: "petco"}
@@ -188,14 +188,14 @@ defmodule ShowContext do
       assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "#{@action}: resource found, data invalid", %{conn: conn, valid_attrs: valid_attrs} do
+    test "#{@action}: resource found, data invalid", %{conn: conn} do
       user = Repo.insert! User.changeset(%User{}, @valid_attrs)
       conn = conn |> put_req_header("content-type", "application/json")
       conn = put conn, user_path(conn, :update, user.id), Poison.encode!(%{user: %{email: "invalid-email-string"}})
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "#{@action}: resource found, data is valid", %{conn: conn, valid_attrs: valid_attrs} do
+    test "#{@action}: resource found, data is valid", %{conn: conn} do
       user  = Repo.insert! Map.merge(%User{}, @valid_attrs)
       conn = put conn, user_path(conn, :update, user.id), Poison.encode!(%{user: %{email: "valid@example.com"}})
       assert json_response(conn, 200)["user"] == %{"id" => user.id,
