@@ -108,7 +108,7 @@ defmodule EmpiriApi.FigurePhotosControllerTest do
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
                     |> post("/publications/#{publication.id}/sections/#{section.id}/photos", photo: photo)
 
-        assert (json_response(connection, 200)["url"] |> String.length) != 0
+        assert json_response(connection, 200)["figure"]["photo_url"]
       end
     end
   end
@@ -224,7 +224,7 @@ defmodule EmpiriApi.FigurePhotosControllerTest do
                     |> put_req_header("authorization", "Bearer #{generate_auth_token(@valid_params)}")
                     |> put("/publications/#{publication.id}/sections/#{section.id}/figures/#{figure.id}/photos", photo: photo)
 
-        assert (json_response(connection, 200)["url"] |> String.length) != 0
+        assert json_response(connection, 200)["figure"]["photo_url"]
       end
     end
   end

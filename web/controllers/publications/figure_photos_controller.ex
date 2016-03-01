@@ -34,7 +34,8 @@ defmodule EmpiriApi.FigurePhotosController do
   defp update_figure(conn, changeset, figure) do
     case Repo.update(changeset) do
       {:ok, figure} ->
-        json conn, %{url: EmpiriApi.Figure.photo_url(figure)}
+        conn
+        |> render(EmpiriApi.FigureView, "show.json", figure: figure)
       {:error, changeset} ->
         Repo.delete!(figure)
 
