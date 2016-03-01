@@ -26,4 +26,3 @@ erl_crash.dump
 # Configuration Files
 /config/dev.exs
 /config/test.exs
-/config/prod.exs
