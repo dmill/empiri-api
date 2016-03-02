@@ -13,7 +13,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :empiri_api, EmpiriApi.Endpoint,
   http: [port: {:system, "PORT"}],
-  url: [scheme: "https", host: "ancient-beyond-56956.herokuapp.com", port: 443],
+  url: [scheme: "https", host: "fierce-inlet-12881.herokuapp.com", port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 # Do not print debug messages in production
