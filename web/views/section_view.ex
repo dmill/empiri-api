@@ -18,8 +18,7 @@ defmodule EmpiriApi.SectionView do
       title: section.title,
       body: section.body,
       position: section.position,
-      publication_id: section.publication_id,
-      figures: FigureView.render("index.json", %{figures: (section |> Repo.preload([:figures])).figures})
-    }
+      publication_id: section.publication_id
+    } |> Map.merge(FigureView.render("index.json", %{figures: (section |> Repo.preload([:figures])).figures}))
   end
 end
