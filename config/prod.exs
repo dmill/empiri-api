@@ -26,6 +26,27 @@ config :empiri_api, EmpiriApi.Repo,
   url: System.get_env("DATABASE_URL"),
   pool_size: 20
 
+config :arc,
+  bucket: "empiri-images",
+  asset_host: "d1zgl05f1mreqj.cloudfront.net",
+  virtual_host: true
+#ex_aws config for AWS credentials
+config :ex_aws,
+  region: "us-west-1",
+  access_key_id: "AKIAINNNAI2FSVVCQSCA",
+  secret_access_key: "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",
+  s3: [
+    scheme: "https://",
+    host: "s3-us-west-1.amazonaws.com",
+    region: "us-west-1"
+  ]
+
+#Auth0 configuration
+config :empiri_api, Auth0,
+  client_id: "32BARvuzoMtbvsTUYcgwwqwKX0EZZgc8",
+  client_secret: "LvYFdcSmTYcd05NuHCf-zTLRqt--ygcqtCn6-WOSVPAqJarW1LFeFkZUfFa3eJQa"
+config :empiri_api, Frontend,
+  origin: "http://localhost:3000"
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
