@@ -1,4 +1,4 @@
-%{"arc": {:git, "git@github.com:dmill/arc.git", "3ba2ca3f02f0f7e90fa52420dbdee75dd0afaef7", []},
+%{"arc": {:git, "https://github.com/dmill/arc.git", "3ba2ca3f02f0f7e90fa52420dbdee75dd0afaef7", []},
   "arc_ecto": {:hex, :arc_ecto, "0.3.1"},
   "base64url": {:hex, :base64url, "0.0.1"},
   "canada": {:hex, :canada, "1.0.0"},
