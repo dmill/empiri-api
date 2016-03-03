@@ -10,9 +10,9 @@ defmodule SharedContext do
         alias EmpiriApi.Section
         alias EmpiriApi.UserPublication
 
-        @valid_attrs %{title: "some content", body: "blah", position: 2}
+        @valid_attrs %{title: "some content", body: "blah"}
 
-        @invalid_attrs %{position: nil}
+        @invalid_attrs %{body: 70}
 
         @user_attrs %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
                        organization: "Harvard", title: "President",
@@ -95,6 +95,7 @@ defmodule SharedContext do
                   |> post("/publications/#{publication.id}/sections", Poison.encode!(%{section: @valid_attrs}))
 
       assert json_response(conn, 201)["section"]["title"] == "some content"
+      assert json_response(conn, 201)["section"]["position"] == 0
       assert (Repo.all(from s in Section,
                       limit: 1,
                       order_by: [desc: s.id])
