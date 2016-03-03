@@ -17,7 +17,7 @@ defmodule EmpiriApi.FigurePhotosController do
 
   def create(conn, %{"section_id" => section_id, "photo" => photo}) do
     section = Repo.get!(Section, section_id)
-    figure = Ecto.build_assoc(section, :figures, %{}) |> Repo.insert!
+    figure = Ecto.build_assoc(section, :figures, %{}) |> Figure.changeset(%{}) |> Repo.insert!
     changeset = Figure.changeset(figure, %{photo: photo})
 
     update_figure(conn, changeset, figure)

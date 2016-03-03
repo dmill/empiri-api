@@ -109,6 +109,7 @@ defmodule EmpiriApi.FigurePhotosControllerTest do
                     |> post("/publications/#{publication.id}/sections/#{section.id}/photos", photo: photo)
 
         assert json_response(connection, 200)["figure"]["photo_url"]
+        assert json_response(connection, 200)["figure"]["position"] == 0
       end
     end
   end
