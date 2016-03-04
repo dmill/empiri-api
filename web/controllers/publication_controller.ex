@@ -44,7 +44,7 @@ defmodule EmpiriApi.PublicationController do
   end
 
   def show(conn, %{"id" => id}) do
-    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors, :sections, :references])
+    publication = Repo.get_by!(Publication, id: id, deleted: false) |> Repo.preload([:users, :authors, :sections, :references, :reviews])
     if !publication.published do
       authorize_unpublished_show(conn, publication)
     else

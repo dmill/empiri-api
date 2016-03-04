@@ -40,7 +40,12 @@ defmodule EmpiriApi.PublicationView do
       last_author_id: publication.last_author_id,
       inserted_at: publication.inserted_at,
       updated_at: publication.updated_at,
-      admin_ids: admin_ids(publication)
+      admin_ids: admin_ids(publication),
+      sentiment: Publication.sentiment(publication),
+      positive_review_count: Publication.positive_review_count(publication),
+      negative_review_count: Publication.negative_review_count(publication),
+      needs_revision_review_count: Publication.needs_revision_review_count(publication),
+      review_count: Publication.review_count(publication)
     }
   end
 

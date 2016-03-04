@@ -59,4 +59,21 @@ defmodule EmpiriApi.PublicationTest do
     assert Publication.admins(Repo.get(Publication, pub.id)) |> Enum.member?(user2)
     refute Publication.admins(Repo.get(Publication, pub.id)) |> Enum.member?(user1)
   end
+
+  test "#sentiment/1" do
+    user_attrs = %{email: "pug@relaxation.com", first_name: "Pug",
+                   last_name: "Jeremy", auth_id: "12345",
+                   organization: "AKC", title: "Overlord",
+                   auth_provider: "petco"}
+
+    user = EmpiriApi.User.changeset(%EmpiriApi.User{}, user_attrs) |> Repo.insert!
+    pub = EmpiriApi.Publication.changeset(%EmpiriApi.Publication{}, %{title: "titulo"}) |> Repo.insert!
+    Enum.each(1..5, fn(x) ->
+      Ecto.build_assoc(pub, :reviews, %{title: "title", body: "body",
+                                        rating: rem(x, 2), user_id: user.id})
+        |> Repo.insert!
+    end)
+
+    assert Publication.sentiment(pub) == 0.6
+  end
 end

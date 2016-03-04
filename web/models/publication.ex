@@ -43,4 +43,23 @@ defmodule EmpiriApi.Publication do
                                 |> Enum.find(fn(uh) -> uh.user_id == user.id && uh.admin end)
                              end)
   end
+
+  def sentiment(model) do
+    if review_count(model) > 0, do: positive_review_count(model) / review_count(model)
+  end
+
+  def review_count(model), do: (model |> Repo.preload([:reviews])).reviews |> Enum.count
+
+  def positive_review_count(model), do: review_type_count(model, 1)
+
+  def negative_review_count(model), do: review_type_count(model, -1)
+
+  def needs_revision_review_count(model), do: review_type_count(model, 0)
+
+  defp review_type_count(model, type) do
+    (model |> Repo.preload([:reviews])).reviews
+      |> Enum.reduce(0, fn(rev, acc) ->
+            if rev.rating == type, do: acc + 1, else: acc
+         end)
+  end
 end
