@@ -43,8 +43,8 @@ config :ex_aws,
 
 #Auth0 configuration
 config :empiri_api, Auth0,
-  client_id: "32BARvuzoMtbvsTUYcgwwqwKX0EZZgc8",
-  client_secret: "LvYFdcSmTYcd05NuHCf-zTLRqt--ygcqtCn6-WOSVPAqJarW1LFeFkZUfFa3eJQa"
+  client_id: "ZJAMnydEkTfKmOrcH6ogSX1qEqSvF3Z4",
+  client_secret: "wOCuaoIqwbbHeBf6zeNQbmSRCZ1rjNCTh2aKi0k8PtKbi-j2I4-HRiSq7x27xNqI"
 config :empiri_api, Frontend,
   origin: "https://d2qkabhj3hcddq.cloudfront.net"
 # ## SSL Support
