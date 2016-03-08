@@ -16,7 +16,8 @@ defmodule EmpiriApi.FigureView do
       position: figure.position,
       title: figure.title,
       section_id: figure.section_id,
-      photo_url: EmpiriApi.Figure.photo_url(figure)
+      photo_url: EmpiriApi.Figure.photo_url(figure),
+      thumbnail_photo_url: EmpiriApi.Figure.thumbnail_photo_url(figure)
     }
   end
 end

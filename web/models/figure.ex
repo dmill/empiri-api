@@ -39,6 +39,11 @@ defmodule EmpiriApi.Figure do
     if url, do: "https://#{url}", else: nil
   end
 
+  def thumbnail_photo_url(model) do
+    url = EmpiriApi.FigurePhoto.url({model.photo, model}, :thumb)
+    if url, do: "https://#{url}", else: nil
+  end
+
   def siblings(model) do
     model = model |> Repo.preload([:section])
     (model.section |> Repo.preload([:figures])).figures
