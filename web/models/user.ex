@@ -50,7 +50,7 @@ defmodule EmpiriApi.User do
   end
 
   def photo_url(model) do
-    url = EmpiriApi.ProfilePhoto.url({model.profile_photo, model}, :original)
+    url = EmpiriApi.ProfilePhoto.url({model.profile_photo, model}, :thumb)
     if url, do: "https://#{url}", else: nil
   end
 end

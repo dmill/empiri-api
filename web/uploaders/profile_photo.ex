@@ -5,7 +5,7 @@ defmodule EmpiriApi.ProfilePhoto do
   # Include ecto support (requires package arc_ecto installed):
   # use Arc.Ecto.Definition
 
-  @versions [:original]
+  @versions [:thumb]
 
   # To add a thumbnail version:
   # @versions [:original, :thumb]
@@ -16,14 +16,14 @@ defmodule EmpiriApi.ProfilePhoto do
   # end
 
   # Define a thumbnail transformation:
-  # def transform(:thumb, _) do
-  #   {:convert, "-strip -thumbnail 250x250^ -gravity center -extent 250x250 -format png"}
-  # end
+  def transform(:thumb, _) do
+    {:convert, "-strip -thumbnail 300x300^ -extent 300x300 -gravity center -format png"}
+  end
 
   # Override the persisted filenames:
-  # def filename(version, _) do
-  #   version
-  # end
+  def filename(version, _) do
+    version
+  end
 
   # Override the storage directory:
   def storage_dir(version, {file, scope}) do
