@@ -22,7 +22,8 @@ defmodule EmpiriApi.ReviewView do
       title: review.title,
       body: review.body,
       rating: review.rating,
-      publication_id: review.publication_id
+      publication_id: review.publication_id,
+      updated_at: review.updated_at
     } |> Map.merge(render_embedded_user(review |> Repo.preload([:user])))
   end
 
