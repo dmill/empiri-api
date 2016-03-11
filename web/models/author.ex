@@ -12,8 +12,8 @@ defmodule EmpiriApi.Author do
     timestamps
   end
 
-  @required_fields ~w(first_name last_name title email organization)
-  @optional_fields ~w()
+  @required_fields ~w(first_name last_name  email)
+  @optional_fields ~w(title organization)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -23,5 +23,6 @@ defmodule EmpiriApi.Author do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> validate_format(:email, ~r/@/)
   end
 end
