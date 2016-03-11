@@ -32,7 +32,11 @@ defmodule EmpiriApi.ReviewControllerTest do
     @action "INDEX"
 
     setup do
-      pub = Repo.insert! %Publication{title: "thing", deleted: false, published: true}
+      pub_user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                           organization: "Harvard", title: "President",
+                                           auth_id: "other", auth_provider: "petco"}) |> Repo.insert!
+      pub = %Publication{title: "thing", deleted: false, published: true} |> Repo.insert!
+      user_pub = Ecto.build_assoc(pub_user, :user_publications, %{publication_id: pub.id}) |> Repo.insert!
 
       Enum.each(1..8, fn(x) ->
           user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
@@ -67,8 +71,14 @@ defmodule EmpiriApi.ReviewControllerTest do
                                 organization: "Harvard", title: "President",
                                 auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
 
+      pub_user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                           organization: "Harvard", title: "President",
+                                           auth_id: "other", auth_provider: "petco"}) |> Repo.insert!
+
       publication = Publication.changeset(%Publication{}, %{title: "some content", last_author_id: 1, first_author_id: 2})
                     |> Repo.insert!
+
+      user_pub = Ecto.build_assoc(pub_user, :user_publications, %{publication_id: publication.id}) |> Repo.insert!
 
       {:ok, conn: conn, user: user, publication: publication}
     end
@@ -149,8 +159,14 @@ defmodule EmpiriApi.ReviewControllerTest do
                                 organization: "Harvard", title: "President",
                                 auth_id: "12345", auth_provider: "petco"}) |> Repo.insert!
 
+      pub_user = User.changeset(%User{}, %{email: "pugs@gmail.com", first_name: "Pug", last_name: "Jeremy",
+                                           organization: "Harvard", title: "President",
+                                           auth_id: "other", auth_provider: "petco"}) |> Repo.insert!
+
       publication = Publication.changeset(%Publication{}, %{title: "some content", last_author_id: 1, first_author_id: 2})
                     |> Repo.insert!
+
+      user_pub = Ecto.build_assoc(pub_user, :user_publications, %{publication_id: publication.id}) |> Repo.insert!
 
       {:ok, conn: conn, user: user, publication: publication}
     end

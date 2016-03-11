@@ -38,13 +38,21 @@ defmodule EmpiriApi.ReviewView do
 
   defp render_embedded_user(review) do
     %{
-      _embedded: UserView.render("show.json", %{user: review.user})
+      _embedded: UserView.render("show.json", %{user: review.user}) |> Map.merge(author(review))
     }
   end
 
-    defp render_embedded_publication(review) do
+  defp render_embedded_publication(review) do
     %{
       _embedded: PublicationView.render("abbreviated_publication.json", %{publication: review.publication |> Repo.preload([:users, :authors])})
+                  |> Map.merge(author(review))
     }
+  end
+
+  defp author(review) do
+    publication = (review |> Repo.preload([:publication])).publication
+    author = (publication |> Repo.preload([:users])).users |> List.first
+
+    %{ author: UserView.render("user.json", %{user: author}) }
   end
 end
