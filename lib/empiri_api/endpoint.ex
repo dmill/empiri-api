@@ -35,7 +35,7 @@ defmodule EmpiriApi.Endpoint do
     key: "_empiri_api_key",
     signing_salt: "9o3pCEP9"
 
-  plug Corsica, origins: Application.get_env(:empiri_api, Frontend)[:origin],
+  plug Corsica, origins: Application.get_env(:empiri_api, Frontend)[:origins],
                 allow_headers: ["accept", "authorization", "content-type"]
   plug EmpiriApi.Router
 end

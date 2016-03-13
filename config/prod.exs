@@ -46,7 +46,9 @@ config :empiri_api, Auth0,
   client_id: "ZJAMnydEkTfKmOrcH6ogSX1qEqSvF3Z4",
   client_secret: "wOCuaoIqwbbHeBf6zeNQbmSRCZ1rjNCTh2aKi0k8PtKbi-j2I4-HRiSq7x27xNqI"
 config :empiri_api, Frontend,
-  origin: "https://d2qkabhj3hcddq.cloudfront.net"
+  origins: ["https://d2qkabhj3hcddq.cloudfront.net",
+            "https://www.empiri.co",
+            "https://empiri.co"]
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
