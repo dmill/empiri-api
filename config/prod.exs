@@ -48,8 +48,7 @@ config :empiri_api, Auth0,
 config :empiri_api, Frontend,
   origins: ["https://d2qkabhj3hcddq.cloudfront.net",
             "https://www.empiri.co",
-            "https://empiri.co"],
-  allow_headers: ["origin"]
+            "https://empiri.co"]
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
